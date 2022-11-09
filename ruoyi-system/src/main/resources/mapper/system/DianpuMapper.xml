@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DianpuMapper">
+    
+    <resultMap type="Dianpu" id="DianpuResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="t_name"    />
+        <result property="appid"    column="appid"    />
+        <result property="clientid"    column="clientid"    />
+        <result property="clientsec"    column="clientsec"    />
+        <result property="msgToken"    column="msg_token"    />
+        <result property="key"    column="t_key"    />
+        <result property="adderss"    column="t_adderss"    />
+        <result property="type"    column="t_type"    />
+        <result property="etime"    column="etime"    />
+        <result property="cookisNum"    column="cookis_num"    />
+        <result property="succCooNum"    column="succ_coo_num"    />
+        <result property="status"    column="t_status"    />
+    </resultMap>
+
+    <sql id="selectDianpuVo">
+        select id, t_name, appid, clientid, clientsec, msg_token, t_key, t_adderss, t_type, etime, cookis_num, succ_coo_num, t_status from dianpu
+    </sql>
+
+    <select id="selectDianpuList" parameterType="Dianpu" resultMap="DianpuResult">
+        <include refid="selectDianpuVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and t_name like concat('%', #{name}, '%')</if>
+            <if test="appid != null  and appid != ''"> and appid = #{appid}</if>
+            <if test="clientid != null  and clientid != ''"> and clientid = #{clientid}</if>
+            <if test="clientsec != null  and clientsec != ''"> and clientsec = #{clientsec}</if>
+            <if test="msgToken != null  and msgToken != ''"> and msg_token = #{msgToken}</if>
+            <if test="key != null  and key != ''"> and t_key = #{key}</if>
+            <if test="adderss != null  and adderss != ''"> and adderss = #{adderss}</if>
+            <if test="type != null "> and t_type = #{type}</if>
+            <if test="etime != null "> and etime = #{etime}</if>
+            <if test="cookisNum != null "> and cookis_num = #{cookisNum}</if>
+            <if test="succCooNum != null "> and succ_coo_num = #{succCooNum}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectDianpuById" parameterType="Long" resultMap="DianpuResult">
+        <include refid="selectDianpuVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDianpu" parameterType="Dianpu">
+        insert into dianpu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">t_name,</if>
+            <if test="appid != null">appid,</if>
+            <if test="clientid != null">clientid,</if>
+            <if test="clientsec != null">clientsec,</if>
+            <if test="msgToken != null">msg_token,</if>
+            <if test="key != null">t_key,</if>
+            <if test="adderss != null">t_adderss,</if>
+            <if test="type != null">t_type,</if>
+            <if test="etime != null">etime,</if>
+            <if test="cookisNum != null">cookis_num,</if>
+            <if test="succCooNum != null">succ_coo_num,</if>
+            <if test="status != null">t_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="appid != null">#{appid},</if>
+            <if test="clientid != null">#{clientid},</if>
+            <if test="clientsec != null">#{clientsec},</if>
+            <if test="msgToken != null">#{msgToken},</if>
+            <if test="key != null">#{key},</if>
+            <if test="adderss != null">#{adderss},</if>
+            <if test="type != null">#{type},</if>
+            <if test="etime != null">#{etime},</if>
+            <if test="cookisNum != null">#{cookisNum},</if>
+            <if test="succCooNum != null">#{succCooNum},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDianpu" parameterType="Dianpu">
+        update dianpu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">t_name = #{name},</if>
+            <if test="appid != null">appid = #{appid},</if>
+            <if test="clientid != null">clientid = #{clientid},</if>
+            <if test="clientsec != null">clientsec = #{clientsec},</if>
+            <if test="msgToken != null">msg_token = #{msgToken},</if>
+            <if test="key != null">t_key = #{key},</if>
+            <if test="adderss != null">t_adderss = #{adderss},</if>
+            <if test="type != null">t_type = #{type},</if>
+            <if test="etime != null">etime = #{etime},</if>
+            <if test="cookisNum != null">cookis_num = #{cookisNum},</if>
+            <if test="succCooNum != null">succ_coo_num = #{succCooNum},</if>
+            <if test="status != null">t_status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDianpuById" parameterType="Long">
+        delete from dianpu where id = #{id}
+    </delete>
+
+    <delete id="deleteDianpuByIds" parameterType="String">
+        delete from dianpu where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

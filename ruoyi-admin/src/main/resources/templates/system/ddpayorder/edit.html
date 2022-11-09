@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改多多373订单')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-ddpayorder-edit" th:object="${ddpayorder}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">店铺编号：</label>
+                <div class="col-sm-8">
+                    <textarea name="appid" class="form-control">[[*{appid}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">店铺名称：</label>
+                <div class="col-sm-8">
+                    <textarea name="name" class="form-control">[[*{name}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">单号：</label>
+                <div class="col-sm-8">
+                    <textarea name="orderId" class="form-control">[[*{orderId}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">金额：</label>
+                <div class="col-sm-8">
+                    <input name="amount" th:field="*{amount}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">下单地址：</label>
+                <div class="col-sm-8">
+                    <textarea name="orderUrl" class="form-control">[[*{orderUrl}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">支付地址：</label>
+                <div class="col-sm-8">
+                    <textarea name="payUrl" class="form-control">[[*{payUrl}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">付款方式：</label>
+                <div class="col-sm-8">
+                    <input name="method" th:field="*{method}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">cookie：</label>
+                <div class="col-sm-8">
+                    <textarea name="cookie" class="form-control">[[*{cookie}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">body：</label>
+                <div class="col-sm-8">
+                    <textarea name="body" class="form-control">[[*{body}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">返回内容：</label>
+                <div class="col-sm-8">
+                    <textarea name="response" class="form-control">[[*{response}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">结果：</label>
+                <div class="col-sm-8">
+                    <textarea name="result" class="form-control">[[*{result}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">失效时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="invalidTime" th:value="${#dates.format(ddpayorder.invalidTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">回调地址：</label>
+                <div class="col-sm-8">
+                    <input name="callbakUrl" th:field="*{callbakUrl}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">回调订单号：</label>
+                <div class="col-sm-8">
+                    <input name="merchantOrderNo" th:field="*{merchantOrderNo}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">完成时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="completionTime" th:value="${#dates.format(ddpayorder.completionTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/ddpayorder";
+        $("#form-ddpayorder-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-ddpayorder-edit').serialize());
+            }
+        }
+
+        $("input[name='invalidTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $("input[name='completionTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OrderListMapper">
+    
+    <resultMap type="OrderList" id="OrderListResult">
+        <result property="id"    column="id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="phone"    column="phone"    />
+        <result property="price"    column="price"    />
+        <result property="addDown"    column="add_down"    />
+        <result property="payAdd"    column="pay_add"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="cookie"    column="cookie"    />
+        <result property="body"    column="body"    />
+        <result property="response"    column="response"    />
+        <result property="payStatus"    column="pay_status"    />
+        <result property="creatad"    column="creatad"    />
+        <result property="compTime"    column="comp_time"    />
+        <result property="yuchang"    column="yuchang"    />
+    </resultMap>
+
+    <sql id="selectOrderListVo">
+        select id, order_no, phone, price, add_down, pay_add, pay_type, cookie, body, response, pay_status, creatad, comp_time, yuchang from order_list
+    </sql>
+
+    <select id="selectOrderListList" parameterType="OrderList" resultMap="OrderListResult">
+        <include refid="selectOrderListVo"/>
+        <where>  
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="addDown != null  and addDown != ''"> and add_down = #{addDown}</if>
+            <if test="payAdd != null  and payAdd != ''"> and pay_add = #{payAdd}</if>
+            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
+            <if test="cookie != null  and cookie != ''"> and cookie = #{cookie}</if>
+            <if test="body != null  and body != ''"> and body = #{body}</if>
+            <if test="response != null  and response != ''"> and response = #{response}</if>
+            <if test="payStatus != null "> and pay_status = #{payStatus}</if>
+            <if test="creatad != null "> and creatad = #{creatad}</if>
+            <if test="compTime != null "> and comp_time = #{compTime}</if>
+            <if test="yuchang != null  and yuchang != ''"> and yuchang = #{yuchang}</if>
+        </where>
+    </select>
+    
+    <select id="selectOrderListById" parameterType="Long" resultMap="OrderListResult">
+        <include refid="selectOrderListVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertOrderList" parameterType="OrderList" useGeneratedKeys="true" keyProperty="id">
+        insert into order_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="phone != null">phone,</if>
+            <if test="price != null">price,</if>
+            <if test="addDown != null">add_down,</if>
+            <if test="payAdd != null">pay_add,</if>
+            <if test="payType != null">pay_type,</if>
+            <if test="cookie != null">cookie,</if>
+            <if test="body != null">body,</if>
+            <if test="response != null">response,</if>
+            <if test="payStatus != null">pay_status,</if>
+            <if test="creatad != null">creatad,</if>
+            <if test="compTime != null">comp_time,</if>
+            <if test="yuchang != null">yuchang,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="price != null">#{price},</if>
+            <if test="addDown != null">#{addDown},</if>
+            <if test="payAdd != null">#{payAdd},</if>
+            <if test="payType != null">#{payType},</if>
+            <if test="cookie != null">#{cookie},</if>
+            <if test="body != null">#{body},</if>
+            <if test="response != null">#{response},</if>
+            <if test="payStatus != null">#{payStatus},</if>
+            <if test="creatad != null">#{creatad},</if>
+            <if test="compTime != null">#{compTime},</if>
+            <if test="yuchang != null">#{yuchang},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOrderList" parameterType="OrderList">
+        update order_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="addDown != null">add_down = #{addDown},</if>
+            <if test="payAdd != null">pay_add = #{payAdd},</if>
+            <if test="payType != null">pay_type = #{payType},</if>
+            <if test="cookie != null">cookie = #{cookie},</if>
+            <if test="body != null">body = #{body},</if>
+            <if test="response != null">response = #{response},</if>
+            <if test="payStatus != null">pay_status = #{payStatus},</if>
+            <if test="creatad != null">creatad = #{creatad},</if>
+            <if test="compTime != null">comp_time = #{compTime},</if>
+            <if test="yuchang != null">yuchang = #{yuchang},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOrderListById" parameterType="Long">
+        delete from order_list where id = #{id}
+    </delete>
+
+    <delete id="deleteOrderListByIds" parameterType="String">
+        delete from order_list where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

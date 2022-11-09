@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增多多373店铺')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-ddpayshop-add">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">店铺名称：</label>
+                <div class="col-sm-8">
+                    <textarea name="name" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">appid：</label>
+                <div class="col-sm-8">
+                    <textarea name="appid" class="form-control"></textarea>
+                </div>
+            </div>
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">clientid：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <textarea name="clientid" class="form-control"></textarea>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">clientsec：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <textarea name="clientsec" class="form-control"></textarea>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">msg_token：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <textarea name="msgToken" class="form-control"></textarea>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="form-group">
+                <label class="col-sm-3 control-label">cookie：</label>
+                <div class="col-sm-8">
+                    <textarea name="cookie" class="form-control"></textarea>
+                </div>
+            </div>
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">key：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <textarea name="key" class="form-control"></textarea>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">推送地址：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <textarea name="pushUrl" class="form-control"></textarea>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="form-group">
+                <label class="col-sm-3 control-label">收款方式：</label>
+                <div class="col-sm-8">
+                    <input name="payMethod" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">cookie有效时长：</label>
+                <div class="col-sm-8">
+                    <input name="cookieExpire" class="form-control" type="text">
+                </div>
+            </div>
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">cookie启动个数：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input name="cookieCount" class="form-control" type="text">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">cookie最大订单数：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input name="cookieMaxOrder" class="form-control" type="text">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label is-required">是否删除：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input name="deleted" class="form-control" type="text" required>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">创建人ID：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input name="createId" class="form-control" type="text">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">最后修改人ID：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input name="updateId" class="form-control" type="text">-->
+<!--                </div>-->
+<!--            </div>-->
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/ddpayshop"
+        $("#form-ddpayshop-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-ddpayshop-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

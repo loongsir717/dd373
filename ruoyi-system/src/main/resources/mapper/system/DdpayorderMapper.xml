@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DdpayorderMapper">
+    
+    <resultMap type="Ddpayorder" id="DdpayorderResult">
+        <result property="id"    column="id"    />
+        <result property="appid"    column="appid"    />
+        <result property="name"    column="name"    />
+        <result property="orderId"    column="orderId"    />
+        <result property="phone"    column="phone"    />
+        <result property="amount"    column="amount"    />
+        <result property="orderUrl"    column="orderUrl"    />
+        <result property="payUrl"    column="payUrl"    />
+        <result property="method"    column="method"    />
+        <result property="cookie"    column="cookie"    />
+        <result property="body"    column="body"    />
+        <result property="response"    column="response"    />
+        <result property="result"    column="result"    />
+        <result property="invalidTime"    column="invalidTime"    />
+        <result property="status"    column="status"    />
+        <result property="callbakUrl"    column="callbakUrl"    />
+        <result property="callbakStatus"    column="callbakStatus"    />
+        <result property="merchantOrderNo"    column="merchantOrderNo"    />
+        <result property="completionTime"    column="completionTime"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createTime"    column="createTime"    />
+        <result property="updateTime"    column="updateTime"    />
+        <result property="createBy"    column="createBy"    />
+        <result property="updateBy"    column="updateBy"    />
+        <result property="createId"    column="createId"    />
+        <result property="updateId"    column="updateId"    />
+    </resultMap>
+
+    <sql id="selectDdpayorderVo">
+        select id, appid, name, orderId, phone, amount, orderUrl, payUrl, method, cookie, body, response, result, invalidTime, status, callbakUrl, callbakStatus, merchantOrderNo, completionTime, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayorder
+    </sql>
+
+    <select id="selectDdpayorderList" parameterType="Ddpayorder" resultMap="DdpayorderResult">
+        <include refid="selectDdpayorderVo"/>
+        <where>  
+            <if test="appid != null  and appid != ''"> and appid = #{appid}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="orderId != null  and orderId != ''"> and orderId = #{orderId}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="amount != null "> and amount = #{amount}</if>
+            <if test="orderUrl != null  and orderUrl != ''"> and orderUrl = #{orderUrl}</if>
+            <if test="payUrl != null  and payUrl != ''"> and payUrl = #{payUrl}</if>
+            <if test="method != null  and method != ''"> and method = #{method}</if>
+            <if test="cookie != null  and cookie != ''"> and cookie = #{cookie}</if>
+            <if test="body != null  and body != ''"> and body = #{body}</if>
+            <if test="response != null  and response != ''"> and response = #{response}</if>
+            <if test="result != null  and result != ''"> and result = #{result}</if>
+            <if test="invalidTime != null "> and invalidTime = #{invalidTime}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="callbakUrl != null  and callbakUrl != ''"> and callbakUrl = #{callbakUrl}</if>
+            <if test="callbakStatus != null "> and callbakStatus = #{callbakStatus}</if>
+            <if test="merchantOrderNo != null  and merchantOrderNo != ''"> and merchantOrderNo = #{merchantOrderNo}</if>
+            <if test="completionTime != null "> and completionTime = #{completionTime}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="createTime != null "> and createTime = #{createTime}</if>
+            <if test="updateTime != null "> and updateTime = #{updateTime}</if>
+            <if test="createBy != null  and createBy != ''"> and createBy = #{createBy}</if>
+            <if test="updateBy != null  and updateBy != ''"> and updateBy = #{updateBy}</if>
+            <if test="createId != null "> and createId = #{createId}</if>
+            <if test="updateId != null "> and updateId = #{updateId}</if>
+        </where>
+        order by createTime desc
+    </select>
+    
+    <select id="selectDdpayorderById" parameterType="Long" resultMap="DdpayorderResult">
+        <include refid="selectDdpayorderVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDdpayorder" parameterType="Ddpayorder" useGeneratedKeys="true" keyProperty="id">
+        insert into ddpayorder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="appid != null">appid,</if>
+            <if test="name != null">name,</if>
+            <if test="orderId != null">orderId,</if>
+            <if test="phone != null">phone,</if>
+            <if test="amount != null">amount,</if>
+            <if test="orderUrl != null">orderUrl,</if>
+            <if test="payUrl != null">payUrl,</if>
+            <if test="method != null">method,</if>
+            <if test="cookie != null">cookie,</if>
+            <if test="body != null">body,</if>
+            <if test="response != null">response,</if>
+            <if test="result != null">result,</if>
+            <if test="invalidTime != null">invalidTime,</if>
+            <if test="status != null">status,</if>
+            <if test="callbakUrl != null">callbakUrl,</if>
+            <if test="callbakStatus != null">callbakStatus,</if>
+            <if test="merchantOrderNo != null">merchantOrderNo,</if>
+            <if test="completionTime != null">completionTime,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">createTime,</if>
+            <if test="updateTime != null">updateTime,</if>
+            <if test="createBy != null">createBy,</if>
+            <if test="updateBy != null">updateBy,</if>
+            <if test="createId != null">createId,</if>
+            <if test="updateId != null">updateId,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="appid != null">#{appid},</if>
+            <if test="name != null">#{name},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="orderUrl != null">#{orderUrl},</if>
+            <if test="payUrl != null">#{payUrl},</if>
+            <if test="method != null">#{method},</if>
+            <if test="cookie != null">#{cookie},</if>
+            <if test="body != null">#{body},</if>
+            <if test="response != null">#{response},</if>
+            <if test="result != null">#{result},</if>
+            <if test="invalidTime != null">#{invalidTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="callbakUrl != null">#{callbakUrl},</if>
+            <if test="callbakStatus != null">#{callbakStatus},</if>
+            <if test="merchantOrderNo != null">#{merchantOrderNo},</if>
+            <if test="completionTime != null">#{completionTime},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="createId != null">#{createId},</if>
+            <if test="updateId != null">#{updateId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDdpayorder" parameterType="Ddpayorder">
+        update ddpayorder
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="appid != null">appid = #{appid},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="orderId != null">orderId = #{orderId},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="orderUrl != null">orderUrl = #{orderUrl},</if>
+            <if test="payUrl != null">payUrl = #{payUrl},</if>
+            <if test="method != null">method = #{method},</if>
+            <if test="cookie != null">cookie = #{cookie},</if>
+            <if test="body != null">body = #{body},</if>
+            <if test="response != null">response = #{response},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="invalidTime != null">invalidTime = #{invalidTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="callbakUrl != null">callbakUrl = #{callbakUrl},</if>
+            <if test="callbakStatus != null">callbakStatus = #{callbakStatus},</if>
+            <if test="merchantOrderNo != null">merchantOrderNo = #{merchantOrderNo},</if>
+            <if test="completionTime != null">completionTime = #{completionTime},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createTime != null">createTime = #{createTime},</if>
+            <if test="updateTime != null">updateTime = #{updateTime},</if>
+            <if test="createBy != null">createBy = #{createBy},</if>
+            <if test="updateBy != null">updateBy = #{updateBy},</if>
+            <if test="createId != null">createId = #{createId},</if>
+            <if test="updateId != null">updateId = #{updateId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDdpayorderById" parameterType="Long">
+        delete from ddpayorder where id = #{id}
+    </delete>
+
+    <delete id="deleteDdpayorderByIds" parameterType="String">
+        delete from ddpayorder where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

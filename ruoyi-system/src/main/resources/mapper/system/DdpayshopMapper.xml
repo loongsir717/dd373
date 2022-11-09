@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DdpayshopMapper">
+
+    <resultMap type="Ddpayshop" id="DdpayshopResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="appid"    column="appid"    />
+<!--        <result property="clientid"    column="clientid"    />-->
+<!--        <result property="clientsec"    column="clientsec"    />-->
+<!--        <result property="msgToken"    column="msg_token"    />-->
+        <result property="cookie"    column="cookie"    />
+<!--        <result property="key"    column="key"    />-->
+<!--        <result property="pushUrl"    column="pushUrl"    />-->
+        <result property="payMethod"    column="payMethod"    />
+        <result property="cookieExpire"    column="cookieExpire"    />
+        <result property="cookieCount"    column="cookieCount"    />
+        <result property="cookieMaxOrder"    column="cookieMaxOrder"    />
+        <result property="status"    column="status"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createTime"    column="createTime"    />
+        <result property="updateTime"    column="updateTime"    />
+        <result property="createBy"    column="createBy"    />
+        <result property="updateBy"    column="updateBy"    />
+        <result property="createId"    column="createId"    />
+        <result property="updateId"    column="updateId"    />
+    </resultMap>
+
+    <sql id="selectDdpayshopVo">
+        select id, name, appid, cookie,payMethod, cookieExpire, cookieCount, cookieMaxOrder, status, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayshop
+    </sql>
+
+    <select id="selectDdpayshopList" parameterType="Ddpayshop" resultMap="DdpayshopResult">
+        <include refid="selectDdpayshopVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="appid != null  and appid != ''"> and appid = #{appid}</if>
+<!--            <if test="clientid != null  and clientid != ''"> and clientid = #{clientid}</if>-->
+<!--            <if test="clientsec != null  and clientsec != ''"> and clientsec = #{clientsec}</if>-->
+<!--            <if test="msgToken != null  and msgToken != ''"> and msg_token = #{msgToken}</if>-->
+            <if test="cookie != null  and cookie != ''"> and cookie = #{cookie}</if>
+<!--            <if test="key != null  and key != ''"> and key = #{key}</if>-->
+<!--            <if test="pushUrl != null  and pushUrl != ''"> and pushUrl = #{pushUrl}</if>-->
+            <if test="payMethod != null  and payMethod != ''"> and payMethod = #{payMethod}</if>
+            <if test="cookieExpire != null "> and cookieExpire = #{cookieExpire}</if>
+            <if test="cookieCount != null "> and cookieCount = #{cookieCount}</if>
+            <if test="cookieMaxOrder != null "> and cookieMaxOrder = #{cookieMaxOrder}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="createTime != null "> and createTime = #{createTime}</if>
+            <if test="updateTime != null "> and updateTime = #{updateTime}</if>
+            <if test="createBy != null  and createBy != ''"> and createBy = #{createBy}</if>
+            <if test="updateBy != null  and updateBy != ''"> and updateBy = #{updateBy}</if>
+            <if test="createId != null "> and createId = #{createId}</if>
+            <if test="updateId != null "> and updateId = #{updateId}</if>
+        </where>
+    </select>
+
+    <select id="selectDdpayshopById" parameterType="Long" resultMap="DdpayshopResult">
+        <include refid="selectDdpayshopVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDdpayshop" parameterType="Ddpayshop" useGeneratedKeys="true" keyProperty="id">
+        insert into ddpayshop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="appid != null">appid,</if>
+<!--            <if test="clientid != null">clientid,</if>-->
+<!--            <if test="clientsec != null">clientsec,</if>-->
+<!--            <if test="msgToken != null">msg_token,</if>-->
+            <if test="cookie != null">cookie,</if>
+<!--            <if test="key != null">key,</if>-->
+<!--            <if test="pushUrl != null">pushUrl,</if>-->
+            <if test="payMethod != null">payMethod,</if>
+            <if test="cookieExpire != null">cookieExpire,</if>
+            <if test="cookieCount != null">cookieCount,</if>
+            <if test="cookieMaxOrder != null">cookieMaxOrder,</if>
+            <if test="status != null">status,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">createTime,</if>
+            <if test="updateTime != null">updateTime,</if>
+            <if test="createBy != null">createBy,</if>
+            <if test="updateBy != null">updateBy,</if>
+            <if test="createId != null">createId,</if>
+            <if test="updateId != null">updateId,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="appid != null">#{appid},</if>
+<!--            <if test="clientid != null">#{clientid},</if>-->
+<!--            <if test="clientsec != null">#{clientsec},</if>-->
+<!--            <if test="msgToken != null">#{msgToken},</if>-->
+            <if test="cookie != null">#{cookie},</if>
+<!--            <if test="key != null">#{key},</if>-->
+<!--            <if test="pushUrl != null">#{pushUrl},</if>-->
+            <if test="payMethod != null">#{payMethod},</if>
+            <if test="cookieExpire != null">#{cookieExpire},</if>
+            <if test="cookieCount != null">#{cookieCount},</if>
+            <if test="cookieMaxOrder != null">#{cookieMaxOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="createId != null">#{createId},</if>
+            <if test="updateId != null">#{updateId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDdpayshop" parameterType="Ddpayshop">
+        update ddpayshop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="appid != null">appid = #{appid},</if>
+<!--            <if test="clientid != null">clientid = #{clientid},</if>-->
+<!--            <if test="clientsec != null">clientsec = #{clientsec},</if>-->
+<!--            <if test="msgToken != null">msg_token = #{msgToken},</if>-->
+            <if test="cookie != null">cookie = #{cookie},</if>
+<!--            <if test="key != null">key = #{key},</if>-->
+<!--            <if test="pushUrl != null">pushUrl = #{pushUrl},</if>-->
+            <if test="payMethod != null">payMethod = #{payMethod},</if>
+            <if test="cookieExpire != null">cookieExpire = #{cookieExpire},</if>
+            <if test="cookieCount != null">cookieCount = #{cookieCount},</if>
+            <if test="cookieMaxOrder != null">cookieMaxOrder = #{cookieMaxOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createTime != null">createTime = #{createTime},</if>
+            <if test="updateTime != null">updateTime = #{updateTime},</if>
+            <if test="createBy != null">createBy = #{createBy},</if>
+            <if test="updateBy != null">updateBy = #{updateBy},</if>
+            <if test="createId != null">createId = #{createId},</if>
+            <if test="updateId != null">updateId = #{updateId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDdpayshopById" parameterType="Long">
+        delete from ddpayshop where id = #{id}
+    </delete>
+
+    <delete id="deleteDdpayshopByIds" parameterType="String">
+        delete from ddpayshop where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
