@@ -39,7 +39,7 @@ public class OutsideController extends BaseController {
         String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbakUrl()+
                 ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
         logger.info("afterSign:"+afterSign);
-        String sign = Md5Utils.hash(afterSign).toUpperCase(Locale.ROOT);
+        String sign = Md5Utils.hash(afterSign).toUpperCase();
         logger.info("sign:"+sign);
         if(!sign.equals(ddpayorder.getSign())){
             return new AjaxResult(AjaxResult.Type.ERROR,"验签失败！","");

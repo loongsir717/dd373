@@ -148,7 +148,8 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            return new AjaxResult(AjaxResult.Type.ERROR,"未找到店铺信息",null);
         }else {
            //根據店铺 获取订单ID号
-           String cookie = ddpayshopList.get(0).getCookie();
+           ddpayshop = ddpayshopList.get(0);
+           String cookie = ddpayshop.getCookie();
            String objJson ="";
             try{
                 objJson = HttpUtils.sendGet(orderIdUri, param, Constants.UTF8,cookie);
@@ -332,14 +333,14 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     private String callbackUrl(Ddpayorder ddpayorder){
         String parm = appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
         log.info("加密前未加token的串： "+parm);
-        String sign = Md5Utils.hash(parm+token).toUpperCase(Locale.ROOT);
+        String sign = Md5Utils.hash(parm+token).toUpperCase();
         log.info("加token后的加密后的串： "+sign);
         String postData = "{\"appId\":\""+appid+"\"," +
                 "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
                 "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
                 "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
                 "\"amount\":\""+ddpayorder.getAmount()+"\"," +
-                "\"payTime\":\""+ddpayorder.getCompletionTime()+"\"," +
+                "\"payTime\":\""+ddpayorder.getCompletionTime().getTime()+"\"," +
                 "\"sign\":\""+sign+"\"}";
         log.info("回调参数： "+postData);
         log.info("回调地址： "+ddpayorder.getCallbakUrl());
@@ -349,18 +350,13 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         }catch (Exception e){
 
         }
-        if(StringUtils.isEmpty(callbackJson)){
-            return "回调失败！";
-        }
-        JSONObject jsonObject  = JSONObject.parseObject(callbackJson);
-        String callbackStatus = (String) jsonObject.get("code");
-        if("200".equals(callbackStatus)){
+        if("success".equals(callbackJson)){
             ddpayorder.setCallbakStatus(1);
             int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
             if(count>0){
                 log.info("回调订单号："+ddpayorder.getOrderId()+"，成功");
             }
         }
-        return callbackStatus;
+        return callbackJson;
     }
 }
