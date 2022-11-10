@@ -63,6 +63,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
 
+    <select id="selectDdpayshopByAppId" parameterType="String" resultMap="DdpayshopResult">
+        <include refid="selectDdpayshopVo"/>
+        where appid = #{appid}
+    </select>
+
+
     <insert id="insertDdpayshop" parameterType="Ddpayshop" useGeneratedKeys="true" keyProperty="id">
         insert into ddpayshop
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -3,8 +3,8 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.DdpayorderMapper">
-    
-    <resultMap type="Ddpayorder" id="DdpayorderResult">
+
+    <resultMap type="com.ruoyi.system.domain.Ddpayorder" id="DdpayorderResult">
         <result property="id"    column="id"    />
         <result property="appid"    column="appid"    />
         <result property="name"    column="name"    />
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectDdpayorderList" parameterType="Ddpayorder" resultMap="DdpayorderResult">
         <include refid="selectDdpayorderVo"/>
-        <where>  
+        <where>
             <if test="appid != null  and appid != ''"> and appid = #{appid}</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="orderId != null  and orderId != ''"> and orderId = #{orderId}</if>
@@ -68,12 +68,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
         order by createTime desc
     </select>
-    
+
     <select id="selectDdpayorderById" parameterType="Long" resultMap="DdpayorderResult">
         <include refid="selectDdpayorderVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertDdpayorder" parameterType="Ddpayorder" useGeneratedKeys="true" keyProperty="id">
         insert into ddpayorder
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -169,7 +169,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteDdpayorderByIds" parameterType="String">
-        delete from ddpayorder where id in 
+        delete from ddpayorder where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

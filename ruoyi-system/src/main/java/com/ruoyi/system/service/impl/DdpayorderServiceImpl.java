@@ -1,17 +1,23 @@
 package com.ruoyi.system.service.impl;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.DdPayOrderApi;
 import com.ruoyi.common.core.domain.entity.OrderLinkJson;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpUtils;
+import com.ruoyi.common.utils.security.Md5Utils;
 import com.ruoyi.system.controller.DuanxingApi;
 import com.ruoyi.system.domain.Ddpayshop;
 import com.ruoyi.system.mapper.DdpayshopMapper;
@@ -19,11 +25,15 @@ import com.ruoyi.system.service.IDdpayshopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.DdpayorderMapper;
 import com.ruoyi.system.domain.Ddpayorder;
 import com.ruoyi.system.service.IDdpayorderService;
 import com.ruoyi.common.core.text.Convert;
+import org.springframework.web.util.UriUtils;
+
+import javax.swing.*;
 
 /**
  * 多多373订单Service业务层处理
@@ -40,12 +50,20 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     @Autowired
     private DdpayshopMapper ddpayshopMapper;
 
+    @Value(value = "${ddconfig.appid}")
+    private String appid;
+
+    @Value(value = "${ddconfig.token}")
+    private String token;
+
+
     private static final Logger log = LoggerFactory.getLogger(DdpayorderServiceImpl.class);
 
 
     private String orderIdUri = "https://newpay.dd373.com/Api/BankInfo/UserCenter/GetPayParamInfoForDiamond";
     private String orderNoUri = "https://newpay.dd373.com/Api/Cashier/GetPayInfo";
     private String orderPayLink = "https://newpay.dd373.com/Api/Cashier/PaySubmit";
+    private String queryOrder = "https://newpay.dd373.com/Api/FundInfo/UserCenter/List";
     /**
      * 查询多多373订单
      *
@@ -121,34 +139,69 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     }
 
     @Override
-    public Ddpayorder craeteOrderNo(Ddpayorder ddpayorder) {
-       String param = "Number="+ddpayorder.getAmount()+"&isWap=true&returnUrl=";
-        //   String param = "Number=2&isWap=true&returnUrl=";
-        //String cookie = "clientId=27a558b5-b367-4d70-8be6-c769c2932e94; loginToken=be867f2f-075e-415f-890f-9fb4cf81b11a; refreshToken=b3c456ff-01d5-4aba-a9f3-7790091a6a4f; login.dd373.com=a38fad9e-8e03-4bf9-ad2d-8024a0b416e7; userName_cc=dd_itm4hbep; newuser.dd373.com=26ab52a8-71c6-4349-aa77-c01667fe4c0b; goods.dd373.com=532bc20e-0445-44e1-9d48-10a47f031a30; point.dd373.com=15df2b29-fe62-43c6-90c1-59fc4eb147fb; newpay.dd373.com=30d0acf4-0530-497c-82eb-b4de6577b576; mission.dd373.com=23312274-86e4-4de0-9e99-645f4e7d6135; thirdbind.dd373.com=19f101a9-1ddd-4cb0-a474-33fd254464c3; imservice.dd373.com=166b4f3e-fe7c-4949-8f25-51edb3d0f099";
+    public AjaxResult craeteOrderNo(Ddpayorder ddpayorder){
+        String param = "Number="+ddpayorder.getAmount()+"&isWap=true&returnUrl=";
+        String resultCode = "";
         Ddpayshop ddpayshop = new Ddpayshop();
         //查詢店鋪信息
         List<Ddpayshop> ddpayshopList=  ddpayshopMapper.selectDdpayshopList(ddpayshop);
         //獲取店鋪appid/和對應賬號的cookie
-       if(ddpayshopList == null || ddpayshopList.size()==0){
-           return null;
-       }else {
+        if(ddpayshopList == null || ddpayshopList.size()==0){
+           return new AjaxResult(AjaxResult.Type.ERROR,"未找到店铺信息",null);
+        }else {
            //根據店铺 获取订单ID号
            String cookie = ddpayshopList.get(0).getCookie();
-           String objJson = HttpUtils.sendGet(orderIdUri, param, Constants.UTF8,cookie);
+           String objJson ="";
+            try{
+                objJson = HttpUtils.sendGet(orderIdUri, param, Constants.UTF8,cookie);
+            }catch (Exception e){
+
+            }
+            if(StringUtils.isEmpty(objJson)){
+                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+            }
+           if(StringUtils.isEmpty(objJson)){
+               return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
+           }
            JSONObject jsonObject  = JSONObject.parseObject(objJson);
            // {"StatusCode":"0","StatusMsg":"请求成功","StatusData":{"ResultCode":"0","ResultMsg":"操作成功","ResultData":"79fbf99327d04ebf84c37c45689fe46c"}}
            JSONObject jsonObject1 = (JSONObject) jsonObject.get("StatusData");
-           String orderId = (String) jsonObject1.get("ResultData");
-           if(StringUtils.isEmpty(orderId)){
-               return null;
+           if(StringUtils.isEmpty(jsonObject1)){
+               return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
            }
+           resultCode = (String) jsonObject1.get("ResultCode");
+           if(!"0".equals(resultCode)){
+               return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
+           }
+           String orderId = (String) jsonObject1.get("ResultData");
            log.info( "----------------获取订单Id:"+orderId);
-           //根據订单ID号 获取订单号    https://newpay.dd373.com/Api/Cashier/GetPayInfo?OrderId=a0757d0fe6bf457a9f45c88e70017051&payScene[0]=1&payScene[1]=3
             param = "OrderId="+orderId+"&payScene[0]=1&payScene[1]=3";
-           String orderNoJson = HttpUtils.sendGet(orderNoUri, param, Constants.UTF8,cookie);
+
+           String orderNoJson = "";
+
+            try{
+                orderNoJson = HttpUtils.sendGet(orderNoUri, param, Constants.UTF8,cookie);
+            }catch (Exception e){
+
+            }
+            if(StringUtils.isEmpty(orderNoJson)){
+                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+            }
+
+
+           if(StringUtils.isEmpty(orderNoJson)){
+               return new AjaxResult(AjaxResult.Type.ERROR2,"获取订单号请求，返回参数为空！",null);
+           }
            JSONObject jsonObject2  = JSONObject.parseObject(orderNoJson);
            JSONObject statusData = (JSONObject) jsonObject2.get("StatusData");
-           JSONObject resultData = (JSONObject) statusData.get("ResultData");
+           if(StringUtils.isEmpty(statusData)){
+               return new AjaxResult(AjaxResult.Type.ERROR2,"返回参数为空！",null);
+           }
+           resultCode  = (String) statusData.get("ResultCode");
+           if(!"0".equals(resultCode)){
+               return new AjaxResult(AjaxResult.Type.ERROR2,(String) jsonObject1.get("ResultMsg"),null);
+           }
+           JSONObject resultData= (JSONObject) statusData.get("ResultData");
            JSONArray array = (JSONArray) resultData.get("OrderInfos");
            String OrderNo ="";
            String describe = "";
@@ -172,11 +225,24 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            olj.setIsWap(true);
            olj.setPayTypeId("12F3F41DE3124EAFB335FF571A9D164A");
            log.info( "----------------获取订单链接参数:"+olj.toString());
-           //String resorderPayLinkJson  =  HttpUtils.sendPost(orderPayLink, olj.toString(),cookie);
-           String resorderPayLinkJson  =  HttpUtils.doHttpPost(orderPayLink,olj.toString(),"application/json",cookie);
+            String resorderPayLinkJson = "";
+            try{
+                resorderPayLinkJson = HttpUtils.doHttpPost(orderPayLink,olj.toString(),"application/json",cookie);
+            }catch (Exception e){
+            }
+            if(StringUtils.isEmpty(resorderPayLinkJson)){
+                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+            }
            log.info( "----------------返回值:"+resorderPayLinkJson);
+           if(StringUtils.isEmpty(resorderPayLinkJson)){
+               return new AjaxResult(AjaxResult.Type.ERROR3,"获取订单支付链接失败",null);
+           }
            JSONObject orderPayLinkJson  = JSONObject.parseObject(resorderPayLinkJson);
            JSONObject statusData1 = (JSONObject) orderPayLinkJson.get("StatusData");
+           resultCode = (String) statusData1.get("ResultCode");
+           if(!"0".equals(resultCode)){
+               return new AjaxResult(AjaxResult.Type.ERROR3,(String) statusData1.get("ResultMsg"),null);
+           }
            JSONObject resultData2 = (JSONObject) statusData1.get("ResultData");
            String orderPayLink = (String) resultData2.get("Action");
            log.info( "获取订单链接:"+orderPayLink);
@@ -184,12 +250,115 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            ddpayorder.setName(ddpayshop.getName());
            ddpayorder.setOrderId(OrderNo);
            ddpayorder.setAmount(price);
-           ddpayorder.setPayUrl(orderPayLink);
-           ddpayorder.setOrderUrl(orderPayLink);
+           ddpayorder.setCallbakStatus(0);
+           ddpayorder.setPayUrl(UriUtils.decode(orderPayLink,"UTF-8"));
+           ddpayorder.setOrderUrl(UriUtils.decode(orderPayLink,"UTF-8"));
            ddpayorder.setMethod("0");  //只有支付宝
            ddpayorder.setBody(describe);
            ddpayorder.setCreateTime(new Date());
-           return ddpayorder;
+           int count = ddpayorderMapper.insertDdpayorder(ddpayorder);
+           if(count>0){
+               return new AjaxResult(AjaxResult.Type.SUCCESS,null,orderPayLink);
+           }else{
+               return new AjaxResult(AjaxResult.Type.ERROR,"插入数据失败",null);
+           }
        }
+    }
+
+    /**
+     * 1、查询未回调的订单
+     * 2、循环查询对应的订单
+     * 3、回调平台接口
+     * 4、根据回调状态更新订单回调状态
+     * @return
+     */
+    @Override
+    public String callbackOrder(Ddpayorder order) {
+            if(order.getStatus() < 1 ){  //如果订单状态为0 则需要请求dd373
+                String appid = order.getAppid();
+                Ddpayshop   ddpayshop  =   ddpayshopMapper.selectDdpayshopByAppId(appid);
+                if(ddpayshop == null){
+                   return "未找到店铺信息";
+                }
+                String orderNo =  order.getOrderId();
+                String  param= "?StartDate=&EndDate=&Keyword="+orderNo+"&Classify=2&Type=0&PageSize=20&PageIndex=1";
+                String objJson = "";
+                try{
+                    objJson = HttpUtils.sendGet(queryOrder, param, Constants.UTF8,ddpayshop.getCookie());
+                }catch (Exception e){
+
+                }
+                if(StringUtils.isEmpty(objJson)){
+                    return "请求失败";
+                }
+                JSONObject jsonObject  = JSONObject.parseObject(objJson);
+                JSONObject statusData = (JSONObject) jsonObject.get("StatusData");
+                String resultCode  = (String) statusData.get("ResultCode");
+                if(!"0".equals(resultCode)){
+                    return "查询失败";
+                }
+                JSONObject resultData= (JSONObject) statusData.get("ResultData");
+                JSONArray pageResult = (JSONArray) resultData.get("PageResult");
+                if(pageResult.size()>0){
+                    JSONObject ob = (JSONObject) pageResult.get(0);//得到json对象
+                    String state =(String)  ob.get("State");//订单状态
+                    String createDate = (String)  ob.get("CreateDate");//订单日期
+                    String orderId = (String) ob.get("OrderId");// 订单号
+                    if(StringUtils.isNotEmpty(state) && "成功".equals(state)){
+                        order.setStatus(1L);
+                        try{
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            order.setCompletionTime(df.parse(createDate));
+                        }catch (Exception e){
+
+                        }
+                        order.setUpdateTime(new Date());
+                        ddpayorderMapper.updateDdpayorder(order);
+                    }
+                   //回调
+                    String result =  callbackUrl(order);
+                    return result;
+                }
+            }else{
+                //如果已查询成功、但回调失败，需要重新回调！
+                String result =  callbackUrl(order);
+                return result;
+            }
+        return null;
+    }
+
+    private String callbackUrl(Ddpayorder ddpayorder){
+        String sign = appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
+        log.info("加密前未加token的串： "+sign);
+        sign = Md5Utils.hash(sign+token).toUpperCase(Locale.ROOT);
+        log.info("加token后的加密后的串： "+sign);
+        String postData = "{\"appId\":\""+appid+"\"," +
+                "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
+                "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
+                "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
+                "\"amount\":\""+ddpayorder.getAmount()+"\"," +
+                "\"payTime\":\""+ddpayorder.getCompletionTime()+"\"," +
+                "\"sign\":\""+sign+"\"}";
+        log.info("回调参数： "+postData);
+        log.info("回调地址： "+ddpayorder.getCallbakUrl());
+        String callbackJson = "";
+        try{
+           callbackJson  =  HttpUtils.doHttpPost(ddpayorder.getCallbakUrl(),postData,"application/json",null);
+        }catch (Exception e){
+
+        }
+        if(StringUtils.isEmpty(callbackJson)){
+            return "回调失败！";
+        }
+        JSONObject jsonObject  = JSONObject.parseObject(callbackJson);
+        String callbackStatus = (String) jsonObject.get("code");
+        if("200".equals(callbackStatus)){
+            ddpayorder.setCallbakStatus(1);
+            int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
+            if(count>0){
+                log.info("回调订单号："+ddpayorder.getOrderId()+"，成功");
+            }
+        }
+        return callbackStatus;
     }
 }

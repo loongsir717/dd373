@@ -16,7 +16,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为80
-  port: 80
+  port: 8088
   servlet:
     # 应用的访问路径
     context-path: /
@@ -30,7 +30,7 @@ server:
       max: 800
       # Tomcat启动初始化的线程数，默认值10
       min-spare: 100
- 
+
 # 日志配置
 logging:
   level:
@@ -58,7 +58,7 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
-  profiles: 
+  profiles:
     active: druid
   # 文件上传
   servlet:
@@ -83,10 +83,10 @@ mybatis:
     configLocation: classpath:mybatis/mybatis-config.xml
 
 # PageHelper分页插件
-pagehelper: 
+pagehelper:
   helperDialect: mysql
   supportMethodsArguments: true
-  params: count=countSql 
+  params: count=countSql
 
 # Shiro
 shiro:
@@ -103,7 +103,7 @@ shiro:
     captchaType: math
   cookie:
     # 设置Cookie的域名 默认空，即当前访问的域名
-    domain: 
+    domain:
     # 设置cookie的有效访问路径
     path: /
     # 设置HttpOnly属性
@@ -111,7 +111,7 @@ shiro:
     # 设置Cookie的过期时间，天为单位
     maxAge: 30
     # 设置密钥，务必保持唯一性（生成方式，直接拷贝到main运行即可）Base64.encodeToString(CipherUtils.generateNewKey(128, "AES").getEncoded()) （默认启动生成随机秘钥，随机秘钥会导致之前客户端RememberMe Cookie无效，如设置固定秘钥RememberMe Cookie则有效）
-    cipherKey: 
+    cipherKey:
   session:
     # Session超时时间，-1代表永不过期（默认30分钟）
     expireTime: 30
@@ -128,7 +128,7 @@ shiro:
     enabled: true
 
 # 防止XSS攻击
-xss: 
+xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
@@ -146,3 +146,7 @@ jiema:
   password: 123qwe
   prjectName: 小鹅通
   token: c11fcf6bd93c495a8bc5e252d680f320
+
+ddconfig:
+  appid: c11fcf6bd93c495a8bc5e252d680f320
+  token: MTIzcXdlZGQzNzPmtYvor5XmlbDmja5CYXNlNjTmmK/mr5TovoPmma7pgJrnmoTlnKjnur/liqDlr4bnrpfms5Us5Zyo6Kej5Yaz5Lit5paH5Lmx56CB5pe2LOWvueS4reaWh+i/m+ihjOS4jeWQjOaWueW8j+eahOe8lueggeWPr+acieaViOmBv+WFjeS4reaWh+S5seeggQ==

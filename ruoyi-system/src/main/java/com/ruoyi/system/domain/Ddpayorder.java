@@ -1,6 +1,7 @@
 package com.ruoyi.system.domain;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -84,7 +85,7 @@ public class Ddpayorder extends BaseEntity
 
     /** 回调状态 */
     @Excel(name = "回调状态")
-    private Long callbakStatus;
+    private Integer callbakStatus;
 
     /** 回调订单号 */
     @Excel(name = "回调订单号")
@@ -108,6 +109,20 @@ public class Ddpayorder extends BaseEntity
     private Long updateId;
 
     private  String sign;
+
+    private  String timestamps;
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getTimestamps() {
+        return timestamps;
+    }
+
+    public void setTimestamps(String timestamps) {
+        this.timestamps = timestamps;
+    }
 
     public String getSign() {
         return sign;
@@ -261,12 +276,12 @@ public class Ddpayorder extends BaseEntity
     {
         return callbakUrl;
     }
-    public void setCallbakStatus(Long callbakStatus)
+    public void setCallbakStatus(Integer callbakStatus)
     {
         this.callbakStatus = callbakStatus;
     }
 
-    public Long getCallbakStatus()
+    public Integer getCallbakStatus()
     {
         return callbakStatus;
     }

@@ -1,7 +1,9 @@
 package com.ruoyi.system.service;
 
+import java.text.ParseException;
 import java.util.List;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.DdPayOrderApi;
 import com.ruoyi.system.domain.Ddpayorder;
 
@@ -65,6 +67,13 @@ public interface IDdpayorderService
      * 获取订单号、获取支付链接
      * @return
      */
-    public Ddpayorder craeteOrderNo(Ddpayorder ddpayorder);
+    public AjaxResult craeteOrderNo(Ddpayorder ddpayorder);
+
+
+    /**
+     * 根据订单号查询充值是否成功，成功后回调
+     * @return
+     */
+    public String callbackOrder(Ddpayorder ddpayorder) ;
 
 }

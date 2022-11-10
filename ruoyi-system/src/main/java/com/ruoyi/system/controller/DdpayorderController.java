@@ -1,10 +1,14 @@
 package com.ruoyi.system.controller;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ruoyi.common.core.domain.entity.DdPayOrderApi;
+import com.ruoyi.common.enums.CallBackType;
+import com.ruoyi.common.utils.security.Md5Utils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +39,12 @@ public class DdpayorderController extends BaseController
 
     @Autowired
     private IDdpayorderService ddpayorderService;
+
+    @Value(value = "${ddconfig.appid}")
+    private String appid;
+
+    @Value(value = "${ddconfig.token}")
+    private String token;
 
     @RequiresPermissions("system:ddpayorder:view")
     @GetMapping()
@@ -86,13 +96,15 @@ public class DdpayorderController extends BaseController
     @Log(title = "多多373订单", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(Ddpayorder ddpayorder)
-    {
-        ddpayorder =  ddpayorderService.craeteOrderNo(ddpayorder);
-        if(ddpayorder ==null){
-            return null;
-        }
-        return toAjax(ddpayorderService.insertDdpayorder(ddpayorder));
+    public AjaxResult addSave(Ddpayorder ddpayorder){
+        String sign = Md5Utils.hash(appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+
+                ddpayorder.getAmount()+ddpayorder.getTimestamps()+token).toUpperCase(Locale.ROOT);
+        logger.info("sign:"+sign);
+//        if(!sign.equals(ddpayorder.getSign())){
+//            return new AjaxResult(AjaxResult.Type.ERROR,"验签失败！","");
+//        }else{
+           return ddpayorderService.craeteOrderNo(ddpayorder);
+//        }
     }
 
     /**
@@ -131,4 +143,21 @@ public class DdpayorderController extends BaseController
         return toAjax(ddpayorderService.deleteDdpayorderByIds(ids));
     }
 
+
+    /**
+     * 手动回调
+     */
+    @RequiresPermissions("system:ddpayorder:callback")
+    @PostMapping("/callback")
+    @ResponseBody
+    public AjaxResult callback(Long id)
+    {
+        Ddpayorder ddpayorder = ddpayorderService.selectDdpayorderById(id);
+        String  result = ddpayorderService.callbackOrder(ddpayorder);
+        if(CallBackType.OK.getCode().equals(result)){
+            return new AjaxResult(AjaxResult.Type.SUCCESS,"成功",null);
+        }else{
+            return new AjaxResult(AjaxResult.Type.ERROR,result,null);
+        }
+    }
 }
