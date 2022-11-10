@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -258,7 +256,11 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            ddpayorder.setCreateTime(new Date());
            int count = ddpayorderMapper.insertDdpayorder(ddpayorder);
            if(count>0){
-               return new AjaxResult(AjaxResult.Type.SUCCESS,null,orderPayLink);
+               Map<String,String > map = new HashMap();
+               map.put("orderPayLink",orderPayLink);
+               map.put("orderNo",OrderNo);
+               map.put("merchantOrderNo",ddpayorder.getMerchantOrderNo());
+               return new AjaxResult(AjaxResult.Type.SUCCESS,null, JSONObject.toJSON(map));
            }else{
                return new AjaxResult(AjaxResult.Type.ERROR,"插入数据失败",null);
            }
@@ -328,9 +330,9 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     }
 
     private String callbackUrl(Ddpayorder ddpayorder){
-        String sign = appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
-        log.info("加密前未加token的串： "+sign);
-        sign = Md5Utils.hash(sign+token).toUpperCase(Locale.ROOT);
+        String parm = appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
+        log.info("加密前未加token的串： "+parm);
+        String sign = Md5Utils.hash(parm+token).toUpperCase(Locale.ROOT);
         log.info("加token后的加密后的串： "+sign);
         String postData = "{\"appId\":\""+appid+"\"," +
                 "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
