@@ -60,4 +60,8 @@ public interface DdpayshopMapper
      * @return 结果
      */
     public int deleteDdpayshopByIds(String[] ids);
+
+
+    public Ddpayshop getMinAmountDdpayshop();
+
 }

@@ -140,15 +140,11 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     public AjaxResult craeteOrderNo(Ddpayorder ddpayorder){
         String param = "Number="+ddpayorder.getAmount()+"&isWap=true&returnUrl=";
         String resultCode = "";
-        Ddpayshop ddpayshop = new Ddpayshop();
-        //查詢店鋪信息
-        List<Ddpayshop> ddpayshopList=  ddpayshopMapper.selectDdpayshopList(ddpayshop);
+        //查詢店鋪信息  提要订单支付金额 获取最小直接订单店铺
+        Ddpayshop ddpayshop =  ddpayshopMapper.getMinAmountDdpayshop();
+        //查询状态正常
         //獲取店鋪appid/和對應賬號的cookie
-        if(ddpayshopList == null || ddpayshopList.size()==0){
-           return new AjaxResult(AjaxResult.Type.ERROR,"未找到店铺信息",null);
-        }else {
            //根據店铺 获取订单ID号
-           ddpayshop = ddpayshopList.get(0);
            String cookie = ddpayshop.getCookie();
            String objJson ="";
             try{
@@ -265,7 +261,6 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            }else{
                return new AjaxResult(AjaxResult.Type.ERROR,"插入数据失败",null);
            }
-       }
     }
 
     /**

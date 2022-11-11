@@ -88,6 +88,8 @@ public class DdpayshopController extends BaseController
     @ResponseBody
     public AjaxResult addSave(Ddpayshop ddpayshop)
     {
+        ddpayshop.setStatus(0);
+        ddpayshop.setPayMethod("0");
         return toAjax(ddpayshopService.insertDdpayshop(ddpayshop));
     }
 

@@ -55,7 +55,6 @@ public class Ddpayorder extends BaseEntity
     private String method;
 
     /** cookie */
-    @Excel(name = "cookie")
     private String cookie;
 
     /** body */
@@ -63,16 +62,13 @@ public class Ddpayorder extends BaseEntity
     private String body;
 
     /** 返回内容 */
-    @Excel(name = "返回内容")
     private String response;
 
     /** 结果 */
-    @Excel(name = "结果")
     private String result;
 
     /** 失效时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "失效时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date invalidTime;
 
     /** 支付状态 */
@@ -97,15 +93,12 @@ public class Ddpayorder extends BaseEntity
     private Date completionTime;
 
     /** 是否删除,0否,1是 */
-    @Excel(name = "是否删除,0否,1是")
     private Integer deleted;
 
     /** 创建人ID */
-    @Excel(name = "创建人ID")
     private Long createId;
 
     /** 最后修改人ID */
-    @Excel(name = "最后修改人ID")
     private Long updateId;
 
     private  String sign;

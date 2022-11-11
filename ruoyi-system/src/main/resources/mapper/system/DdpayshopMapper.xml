@@ -155,4 +155,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="getMinAmountDdpayshop" resultMap="DdpayshopResult">
+        select dp.appid,dp.name,dp.cookie,o.amount
+        from ddpayshop dp
+                 left join (
+            select appid,name,sum(amount) as amount from ddpayorder
+            where curdate() = date(createTime) and status = 1
+        GROUP BY appid,name
+            ) o on dp.appid = o.appid
+        where dp.status = 0
+<!--    and o.amount < dp.cookieMaxOrder*0.7 -->
+        order by amount asc LIMIT 0,1;
+    </select>
+
 </mapper>

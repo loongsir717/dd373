@@ -41,15 +41,18 @@
                     <i class="fa fa-download"></i> 导出
                 </a>
             </div>
-            <div class="col-sm-12 select-table table-striped">
-                <table id="bootstrap-table"></table>
+            <div class="col-sm-12 select-table table-bordered">
+                <table id="bootstrap-table" data-resizable="true"></table>
             </div>
         </div>
     </div>
-    <th:block th:include="include :: footer" />
+    <div th:include="include :: footer"></div>
+    <th:block th:include="include :: bootstrap-table-resizable-js" />
+
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('system:ddpayshop:edit')}]];
         var removeFlag = [[${@permission.hasPermi('system:ddpayshop:remove')}]];
+        var shopStatus = [[${@dict.getType('sys_notice_status')}]];
         var prefix = ctx + "system/ddpayshop";
 
         $(function() {
@@ -90,7 +93,10 @@
                 // },
                 {
                     field: 'cookie',
-                    title: 'cookie'
+                    title: 'cookie',
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value);
+                    }
                 },
                 // {
                 //     field: 'key',
@@ -100,30 +106,36 @@
                 //     field: 'pushUrl',
                 //     title: '推送地址'
                 // },
-                {
-                    field: 'payMethod',
-                    title: '收款方式'
-                },
-                {
-                    field: 'cookieExpire',
-                    title: 'cookie有效时长'
-                },
-                {
-                    field: 'cookieCount',
-                    title: 'cookie启动个数'
-                },
+                // {
+                //     field: 'payMethod',
+                //     title: '收款方式',
+                //     formatter: function(value, row, index) {
+                //         return $.table.selectDictLabel(payType, value);
+                //     }
+                // },
+                // {
+                //     field: 'cookieExpire',
+                //     title: 'cookie有效时长'
+                // },
+                // {
+                //     field: 'cookieCount',
+                //     title: 'cookie启动个数'
+                // },
                 {
                     field: 'cookieMaxOrder',
-                    title: 'cookie最大订单数'
+                    title: '店铺最大收款金额'
                 },
                 {
                     field: 'status',
-                    title: '状态'
+                    title: '状态',
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(shopStatus, value);
+                     }
                 },
-                {
-                    field: 'deleted',
-                    title: '是否删除'
-                },
+                // {
+                //     field: 'deleted',
+                //     title: '是否删除'
+                // },
                 {
                     field: 'createTime',
                     title: '创建时间'
