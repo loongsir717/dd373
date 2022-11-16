@@ -277,7 +277,7 @@ public class Ddpayorder extends BaseEntity
 
     public void setCallbackStatus(Integer callbackStatus)
     {
-        this.callbackUrl = callbackUrl;
+        this.callbackStatus = callbackStatus;
     }
 
     public void setMerchantOrderNo(String merchantOrderNo)
