@@ -265,8 +265,19 @@ public class Ddpayorder extends BaseEntity
         this.callbackUrl = callbakUrl;
     }
 
-    public String getCallbackUrl() {
+    public String getCallbackUrl()
+    {
         return callbackUrl;
+    }
+
+    public Integer getCallbackStatus()
+    {
+        return callbackStatus;
+    }
+
+    public void setCallbackStatus(Integer callbackStatus)
+    {
+        this.callbackUrl = callbackUrl;
     }
 
     public void setMerchantOrderNo(String merchantOrderNo)
@@ -315,43 +326,35 @@ public class Ddpayorder extends BaseEntity
         return updateId;
     }
 
-    public Integer getCallbackStatus() {
-        return callbackStatus;
-    }
-
-    public void setCallbackStatus(Integer callbackStatus) {
-        this.callbackStatus = callbackStatus;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("appid", getAppid())
-            .append("name", getName())
-            .append("orderId", getOrderId())
-            .append("phone", getPhone())
-            .append("amount", getAmount())
-            .append("orderUrl", getOrderUrl())
-            .append("payUrl", getPayUrl())
-            .append("method", getMethod())
-            .append("cookie", getCookie())
-            .append("body", getBody())
-            .append("response", getResponse())
-            .append("result", getResult())
-            .append("invalidTime", getInvalidTime())
-            .append("status", getStatus())
-            .append("callbakUrl", getCallbackUrl())
-            .append("callbackStatus", getCallbackStatus())
-            .append("merchantOrderNo", getMerchantOrderNo())
-            .append("completionTime", getCompletionTime())
-            .append("deleted", getDeleted())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
-            .append("createBy", getCreateBy())
-            .append("updateBy", getUpdateBy())
-            .append("createId", getCreateId())
-            .append("updateId", getUpdateId())
-            .toString();
+                .append("id", getId())
+                .append("appid", getAppid())
+                .append("name", getName())
+                .append("orderId", getOrderId())
+                .append("phone", getPhone())
+                .append("amount", getAmount())
+                .append("orderUrl", getOrderUrl())
+                .append("payUrl", getPayUrl())
+                .append("method", getMethod())
+                .append("cookie", getCookie())
+                .append("body", getBody())
+                .append("response", getResponse())
+                .append("result", getResult())
+                .append("invalidTime", getInvalidTime())
+                .append("status", getStatus())
+                .append("callbakUrl", getCallbackUrl())
+                .append("callbakStatus", getCallbackStatus())
+                .append("merchantOrderNo", getMerchantOrderNo())
+                .append("completionTime", getCompletionTime())
+                .append("deleted", getDeleted())
+                .append("createTime", getCreateTime())
+                .append("updateTime", getUpdateTime())
+                .append("createBy", getCreateBy())
+                .append("updateBy", getUpdateBy())
+                .append("createId", getCreateId())
+                .append("updateId", getUpdateId())
+                .toString();
     }
 }
