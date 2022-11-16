@@ -97,7 +97,7 @@ public class DdpayorderController extends BaseController
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult addSave(Ddpayorder ddpayorder){
-        String sign = Md5Utils.hash(appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+
+        String sign = Md5Utils.hash(appid+ddpayorder.getOrderId()+ddpayorder.getCallbackUrl()+
                 ddpayorder.getAmount()+ddpayorder.getTimestamps()+token).toUpperCase(Locale.ROOT);
         logger.info("sign:"+sign);
 //        if(!sign.equals(ddpayorder.getSign())){

@@ -142,6 +142,9 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String resultCode = "";
         //查詢店鋪信息  提要订单支付金额 获取最小直接订单店铺
         Ddpayshop ddpayshop =  ddpayshopMapper.getMinAmountDdpayshop();
+        if(ddpayshop == null){
+            return new AjaxResult(AjaxResult.Type.ERROR,"店铺已打烊！",null);
+        }
         //查询状态正常
         //獲取店鋪appid/和對應賬號的cookie
            //根據店铺 获取订单ID号
@@ -326,7 +329,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     }
 
     private String callbackUrl(Ddpayorder ddpayorder){
-        String parm = appid+ddpayorder.getOrderId()+ddpayorder.getCallbakUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
+        String parm = appid+ddpayorder.getOrderId()+ddpayorder.getCallbackUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
         log.info("加密前未加token的串： "+parm);
         String sign = Md5Utils.hash(parm+token).toUpperCase();
         log.info("加token后的加密后的串： "+sign);
@@ -338,10 +341,10 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                 "\"payTime\":\""+ddpayorder.getCompletionTime().getTime()+"\"," +
                 "\"sign\":\""+sign+"\"}";
         log.info("回调参数： "+postData);
-        log.info("回调地址： "+ddpayorder.getCallbakUrl());
+        log.info("回调地址： "+ddpayorder.getCallbackUrl());
         String callbackJson = "";
         try{
-           callbackJson  =  HttpUtils.doHttpPost(ddpayorder.getCallbakUrl(),postData,"application/json",null);
+           callbackJson  =  HttpUtils.doHttpPost(ddpayorder.getCallbackUrl(),postData,"application/json",null);
         }catch (Exception e){
 
         }

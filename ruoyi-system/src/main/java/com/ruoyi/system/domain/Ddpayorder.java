@@ -77,7 +77,7 @@ public class Ddpayorder extends BaseEntity
 
     /** 回调地址 */
     @Excel(name = "回调地址")
-    private String callbakUrl;
+    private String callbackUrl;
 
     /** 回调状态 */
     @Excel(name = "回调状态")
@@ -260,18 +260,18 @@ public class Ddpayorder extends BaseEntity
     {
         return status;
     }
-    public void setCallbakUrl(String callbakUrl)
+    public void setCallbackUrl(String callbakUrl)
     {
-        this.callbakUrl = callbakUrl;
+        this.callbackUrl = callbakUrl;
     }
 
-    public String getCallbakUrl()
+    public String getCallbackUrl()
     {
-        return callbakUrl;
+        return callbackUrl;
     }
     public void setCallbakStatus(Integer callbakStatus)
     {
-        this.callbakStatus = callbakStatus;
+        this.callbackUrl = callbackUrl;
     }
 
     public Integer getCallbakStatus()
@@ -342,7 +342,7 @@ public class Ddpayorder extends BaseEntity
             .append("result", getResult())
             .append("invalidTime", getInvalidTime())
             .append("status", getStatus())
-            .append("callbakUrl", getCallbakUrl())
+            .append("callbakUrl", getCallbackUrl())
             .append("callbakStatus", getCallbakStatus())
             .append("merchantOrderNo", getMerchantOrderNo())
             .append("completionTime", getCompletionTime())

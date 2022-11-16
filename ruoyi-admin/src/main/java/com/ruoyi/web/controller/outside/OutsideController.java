@@ -5,6 +5,8 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.security.Md5Utils;
 import com.ruoyi.system.domain.Ddpayorder;
 import com.ruoyi.system.service.IDdpayorderService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +38,7 @@ public class OutsideController extends BaseController {
     @PostMapping("/createOrder")
     @ResponseBody
     public AjaxResult createOrder(Ddpayorder ddpayorder){
-        String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbakUrl()+
+        String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbackUrl()+
                 ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
         logger.info("afterSign:"+afterSign);
         String sign = Md5Utils.hash(afterSign).toUpperCase();
