@@ -248,7 +248,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            ddpayorder.setName(ddpayshop.getName());
            ddpayorder.setOrderId(OrderNo);
            ddpayorder.setAmount(price);
-           ddpayorder.setCallbakStatus(0);
+           ddpayorder.setCallbackStatus(0);
            ddpayorder.setPayUrl(UriUtils.decode(orderPayLink,"UTF-8"));
            ddpayorder.setOrderUrl(UriUtils.decode(orderPayLink,"UTF-8"));
            ddpayorder.setMethod("0");  //只有支付宝
@@ -349,7 +349,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
 
         }
         if("success".equals(callbackJson)){
-            ddpayorder.setCallbakStatus(1);
+            ddpayorder.setCallbackStatus(1);
             int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
             if(count>0){
                 log.info("回调订单号："+ddpayorder.getOrderId()+"，成功");

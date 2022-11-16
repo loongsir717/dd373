@@ -21,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="invalidTime"    column="invalidTime"    />
         <result property="status"    column="status"    />
         <result property="callbackUrl"    column="callbackUrl"    />
-        <result property="callbakStatus"    column="callbakStatus"    />
+        <result property="callbackStatus"    column="callbackStatus"    />
         <result property="merchantOrderNo"    column="merchantOrderNo"    />
         <result property="completionTime"    column="completionTime"    />
         <result property="deleted"    column="deleted"    />
@@ -34,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectDdpayorderVo">
-        select id, appid, name, orderId, phone, amount, orderUrl, payUrl, method, cookie, body, response, result, invalidTime, status, callbackUrl, callbakStatus, merchantOrderNo, completionTime, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayorder
+        select id, appid, name, orderId, phone, amount, orderUrl, payUrl, method, cookie, body, response, result, invalidTime, status, callbackUrl, callbackStatus, merchantOrderNo, completionTime, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayorder
     </sql>
 
     <select id="selectDdpayorderList" parameterType="Ddpayorder" resultMap="DdpayorderResult">
@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="invalidTime != null "> and invalidTime = #{invalidTime}</if>
             <if test="status != null "> and status = #{status}</if>
             <if test="callbackUrl != null  and callbackUrl != ''"> and callbackUrl = #{callbackUrl}</if>
-            <if test="callbakStatus != null "> and callbakStatus = #{callbakStatus}</if>
+            <if test="callbackStatus != null "> and callbackStatus = #{callbackStatus}</if>
             <if test="merchantOrderNo != null  and merchantOrderNo != ''"> and merchantOrderNo = #{merchantOrderNo}</if>
             <if test="completionTime != null "> and completionTime = #{completionTime}</if>
             <if test="deleted != null "> and deleted = #{deleted}</if>
@@ -92,7 +92,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="invalidTime != null">invalidTime,</if>
             <if test="status != null">status,</if>
             <if test="callbackUrl != null">callbackUrl,</if>
-            <if test="callbakStatus != null">callbakStatus,</if>
+            <if test="callbackStatus != null">callbackStatus,</if>
             <if test="merchantOrderNo != null">merchantOrderNo,</if>
             <if test="completionTime != null">completionTime,</if>
             <if test="deleted != null">deleted,</if>
@@ -119,7 +119,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="invalidTime != null">#{invalidTime},</if>
             <if test="status != null">#{status},</if>
             <if test="callbackUrl != null">#{callbackUrl},</if>
-            <if test="callbakStatus != null">#{callbakStatus},</if>
+            <if test="callbackStatus != null">#{callbackStatus},</if>
             <if test="merchantOrderNo != null">#{merchantOrderNo},</if>
             <if test="completionTime != null">#{completionTime},</if>
             <if test="deleted != null">#{deleted},</if>
@@ -150,7 +150,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="invalidTime != null">invalidTime = #{invalidTime},</if>
             <if test="status != null">status = #{status},</if>
             <if test="callbackUrl != null">callbackUrl = #{callbackUrl},</if>
-            <if test="callbakStatus != null">callbakStatus = #{callbakStatus},</if>
+            <if test="callbackStatus != null">callbackStatus = #{callbackStatus},</if>
             <if test="merchantOrderNo != null">merchantOrderNo = #{merchantOrderNo},</if>
             <if test="completionTime != null">completionTime = #{completionTime},</if>
             <if test="deleted != null">deleted = #{deleted},</if>

@@ -20,7 +20,7 @@
                             </li>
                             <li>
                                 <label>回调状态：</label>
-                                <input type="text" name="callbakStatus"/>
+                                <input type="text" name="callbackStatus"/>
                             </li>
                             <li>
                                 <label>订单编号：</label>
@@ -146,14 +146,14 @@
                     }
                 },
                 {
-                    field: 'callbakUrl',
+                    field: 'callbackUrl',
                     title: '回调地址',
                     formatter: function(value, row, index) {
                         return $.table.tooltip(value);
                     }
                 },
                 {
-                    field: 'callbakStatus',
+                    field: 'callbackStatus',
                     title: '回调状态',
                     formatter: function(value, row, index) {
                         return $.table.selectDictLabel(callbackStatus, value);
