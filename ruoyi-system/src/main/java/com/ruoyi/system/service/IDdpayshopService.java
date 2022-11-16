@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.Ddpayshop;
 
 /**
@@ -42,6 +44,8 @@ public interface IDdpayshopService
      * @return 结果
      */
     public int updateDdpayshop(Ddpayshop ddpayshop);
+
+    public AjaxResult updateshop(Ddpayshop ddpayshop);
 
     /**
      * 批量删除多多373店铺

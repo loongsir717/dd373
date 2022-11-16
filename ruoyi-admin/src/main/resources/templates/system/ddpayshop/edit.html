@@ -10,13 +10,13 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">店铺名称：</label>
                 <div class="col-sm-8">
-                    <textarea name="name" class="form-control">[[*{name}]]</textarea>
+                    <textarea name="name" class="form-control" readonly>[[*{name}]]</textarea>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">appid：</label>
                 <div class="col-sm-8">
-                    <textarea name="appid" class="form-control">[[*{appid}]]</textarea>
+                    <textarea name="appid" class="form-control" readonly>[[*{appid}]]</textarea>
                 </div>
             </div>
 
@@ -26,12 +26,12 @@
                     <textarea name="cookie" class="form-control">[[*{cookie}]]</textarea>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">收款方式：</label>
-                <div class="col-sm-8">
-                    <input name="payMethod"  th:field="*{payMethod}" class="form-control" placeholder="0-支付宝，1-微信"  type="text">
-                </div>
-            </div>
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">收款方式：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input name="payMethod"  th:field="*{payMethod}" class="form-control" placeholder="0-支付宝，1-微信"  type="text">-->
+<!--                </div>-->
+<!--            </div>-->
 
             <div class="form-group">
                 <label class="col-sm-3 control-label">状态:</label>

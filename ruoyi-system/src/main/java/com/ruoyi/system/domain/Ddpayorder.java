@@ -265,19 +265,10 @@ public class Ddpayorder extends BaseEntity
         this.callbackUrl = callbakUrl;
     }
 
-    public String getCallbackUrl()
-    {
+    public String getCallbackUrl() {
         return callbackUrl;
     }
-    public void setCallbackStatus(Integer callbackStatus)
-    {
-        this.callbackUrl = callbackUrl;
-    }
 
-    public Integer getcallbackStatus()
-    {
-        return callbackStatus;
-    }
     public void setMerchantOrderNo(String merchantOrderNo)
     {
         this.merchantOrderNo = merchantOrderNo;
@@ -324,6 +315,14 @@ public class Ddpayorder extends BaseEntity
         return updateId;
     }
 
+    public Integer getCallbackStatus() {
+        return callbackStatus;
+    }
+
+    public void setCallbackStatus(Integer callbackStatus) {
+        this.callbackStatus = callbackStatus;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -343,7 +342,7 @@ public class Ddpayorder extends BaseEntity
             .append("invalidTime", getInvalidTime())
             .append("status", getStatus())
             .append("callbakUrl", getCallbackUrl())
-            .append("callbackStatus", getcallbackStatus())
+            .append("callbackStatus", getCallbackStatus())
             .append("merchantOrderNo", getMerchantOrderNo())
             .append("completionTime", getCompletionTime())
             .append("deleted", getDeleted())

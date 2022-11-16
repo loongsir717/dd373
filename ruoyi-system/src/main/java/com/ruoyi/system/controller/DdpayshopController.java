@@ -113,7 +113,7 @@ public class DdpayshopController extends BaseController
     @ResponseBody
     public AjaxResult editSave(Ddpayshop ddpayshop)
     {
-        return toAjax(ddpayshopService.updateDdpayshop(ddpayshop));
+        return ddpayshopService.updateshop(ddpayshop);
     }
 
     /**
