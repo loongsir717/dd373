@@ -89,7 +89,9 @@ public class DdpayshopServiceImpl implements IDdpayshopService
     public AjaxResult updateshop(Ddpayshop ddpayshop) {
 
         String appid = ddpayshop.getAppid();
-        ddpayshop = getShopInfo(ddpayshop);
+        if(ddpayshop.getStatus()==0){
+            ddpayshop = getShopInfo(ddpayshop);
+        }
         if(ddpayshop !=null){
             if(!appid.equals(ddpayshop.getAppid())){
                 return AjaxResult.error("不同手机号的Cookie");

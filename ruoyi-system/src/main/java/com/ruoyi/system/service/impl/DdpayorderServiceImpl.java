@@ -168,7 +168,11 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
            }
            resultCode = (String) jsonObject1.get("ResultCode");
-           if(!"0".equals(resultCode)){
+           if("4001".equals(resultCode)){
+               ddpayshop.setStatus(0);
+               ddpayshopMapper.updateDdpayshop(ddpayshop);
+               return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
+           }else if(!"0".equals(resultCode)){
                return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
            }
            String orderId = (String) jsonObject1.get("ResultData");

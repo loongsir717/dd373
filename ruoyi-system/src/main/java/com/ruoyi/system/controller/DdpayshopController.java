@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import com.ruoyi.system.service.IDdpayorderService;
@@ -113,6 +114,7 @@ public class DdpayshopController extends BaseController
     @ResponseBody
     public AjaxResult editSave(Ddpayshop ddpayshop)
     {
+        ddpayshop.setUpdateTime(new Date());
         return ddpayshopService.updateshop(ddpayshop);
     }
 

@@ -36,7 +36,8 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">状态:</label>
                 <div class="col-sm-8">
-                    <input name="status" th:field="*{status}" class="form-control" placeholder="0-正常，1-关闭" type="text">
+                    <label class="radio-box"> <input type="radio" th:field="*{status}" name="status" value="0"/> 正常 </label>
+                    <label class="radio-box"> <input type="radio" th:field="*{status}" name="status" value="1"/> 关闭 </label>
                 </div>
             </div>
 
