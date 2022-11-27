@@ -87,6 +87,6 @@ public interface IDdpayorderService
     public Ddpayorder queryOrder(Ddpayorder ddpayorder);
 
 
-
+    public List<Ddpayorder> selectPayorderStatusList(Ddpayorder ddpayorder);
 
 }

@@ -27,6 +27,16 @@ public interface DdpayorderMapper
      */
     public List<Ddpayorder> selectDdpayorderList(Ddpayorder ddpayorder);
 
+
+    /**
+     * 查询多多373订单列表
+     *
+     * @param ddpayorder 多多373订单
+     * @return 多多373订单集合
+     */
+    public List<Ddpayorder> selectPayorderStatusList(Ddpayorder ddpayorder);
+
+
     /**
      * 新增多多373订单
      *

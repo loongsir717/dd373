@@ -170,6 +170,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
+
+
+    <select id="selectPayorderStatusList" parameterType="Ddpayorder" resultMap="DdpayorderResult">
+        <include refid="selectDdpayorderVo"/>
+        where callbackStatus = #{callbackStatus} and now() > date_add(createTime,interval 30 minute)
+        order by createTime desc
+    </select>
+
+
     <delete id="deleteDdpayorderById" parameterType="Long">
         delete from ddpayorder where id = #{id}
     </delete>

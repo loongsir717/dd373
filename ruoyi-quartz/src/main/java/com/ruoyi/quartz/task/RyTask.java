@@ -38,7 +38,7 @@ public class RyTask
         logger.info("DdOrderCallbackTask定时任务开始");
         Ddpayorder ddpayorder = new Ddpayorder();
         ddpayorder.setCallbackStatus(0);
-        List<Ddpayorder> ddpayorderList = ddpayorderService.selectDdpayorderList(ddpayorder);
+        List<Ddpayorder> ddpayorderList = ddpayorderService.selectPayorderStatusList(ddpayorder);
         if(ddpayorderList != null&& ddpayorderList.size()>0){
             for (Ddpayorder order:ddpayorderList) {
                 ddpayorderService.callbackOrder(order);

@@ -86,6 +86,14 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         return ddpayorderMapper.selectDdpayorderList(ddpayorder);
     }
 
+
+    @Override
+    public List<Ddpayorder> selectPayorderStatusList(Ddpayorder ddpayorder)
+    {
+        return ddpayorderMapper.selectPayorderStatusList(ddpayorder);
+    }
+
+
     @Override
     public Ddpayorder queryOrder(Ddpayorder ddpayorder) {
         return ddpayorderMapper.queryOrder(ddpayorder);
@@ -338,7 +346,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     }
 
     private String callbackUrl(Ddpayorder ddpayorder){
-        String parm = appid+ddpayorder.getOrderId()+ddpayorder.getCallbackUrl()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
+        String parm = appid+ddpayorder.getOrderId()+ddpayorder.getMerchantOrderNo()+ddpayorder.getStatus()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
         log.info("加密前未加token的串： "+parm);
         String sign = Md5Utils.hash(parm+token).toUpperCase();
         log.info("加token后的加密后的串： "+sign);
