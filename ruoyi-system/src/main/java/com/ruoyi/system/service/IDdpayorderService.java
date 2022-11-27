@@ -76,4 +76,17 @@ public interface IDdpayorderService
      */
     public String callbackOrder(Ddpayorder ddpayorder) ;
 
+
+
+    /**
+     * 查询多多373订单
+     *
+     * @param ddpayorder 多多373订单主键
+     * @return 多多373订单
+     */
+    public Ddpayorder queryOrder(Ddpayorder ddpayorder);
+
+
+
+
 }

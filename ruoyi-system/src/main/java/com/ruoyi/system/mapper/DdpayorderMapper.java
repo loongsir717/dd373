@@ -43,6 +43,10 @@ public interface DdpayorderMapper
      */
     public int updateDdpayorder(Ddpayorder ddpayorder);
 
+
+    public Ddpayorder queryOrder(Ddpayorder ddpayorder);
+
+
     /**
      * 删除多多373订单
      *

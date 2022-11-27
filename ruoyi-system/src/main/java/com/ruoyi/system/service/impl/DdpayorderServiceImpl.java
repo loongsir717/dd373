@@ -86,6 +86,11 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         return ddpayorderMapper.selectDdpayorderList(ddpayorder);
     }
 
+    @Override
+    public Ddpayorder queryOrder(Ddpayorder ddpayorder) {
+        return ddpayorderMapper.queryOrder(ddpayorder);
+    }
+
     /**
      * 新增多多373订单
      *

@@ -74,6 +74,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
 
+    <select id="queryOrder" parameterType="Ddpayorder" resultMap="DdpayorderResult">
+        <include refid="selectDdpayorderVo"/>
+        where orderId = #{orderId} and merchantOrderNo = #{merchantOrderNo} and amount = #{amount}
+    </select>
+
+
     <insert id="insertDdpayorder" parameterType="Ddpayorder" useGeneratedKeys="true" keyProperty="id">
         insert into ddpayorder
         <trim prefix="(" suffix=")" suffixOverrides=",">
