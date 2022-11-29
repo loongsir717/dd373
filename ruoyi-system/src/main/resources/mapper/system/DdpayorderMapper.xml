@@ -174,7 +174,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectPayorderStatusList" parameterType="Ddpayorder" resultMap="DdpayorderResult">
         <include refid="selectDdpayorderVo"/>
-        where callbackStatus = #{callbackStatus} and now() > date_add(createTime,interval 30 minute)
+        where callbackStatus = #{callbackStatus} and now() &lt; date_add(createTime,interval 30 minute)
         order by createTime desc
     </select>
 
