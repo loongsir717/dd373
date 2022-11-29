@@ -1,5 +1,7 @@
 package com.ruoyi.common.utils.http;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -276,7 +278,7 @@ public class HttpRequest {
         return this.data;
     }
 
-
+/*
     //测试发送GET和POST请求
     public static void main(String[] args) throws Exception {
         //发送POST请求
@@ -289,7 +291,7 @@ public class HttpRequest {
         headers.put("X-app-system-version", "13.3");
         headers.put("X-device-code", "C88A0C48-C02C-401D-BDD3-BD1775F78D9D");
         headers.put("Accept", "application/json");
-        headers.put("Cookie","userName_cc=dd_itm4hbep; clientId=70d1f116-1ede-41d4-92f2-7091a357e280; loginToken=ac9fc61e-a372-4a2b-a4a5-1daf0edf64df; refreshToken=601b9900-daff-46d4-8262-3f4f4cecc294; login.dd373.com=85248d0b-c1e1-42f0-9fa0-659a0db1f5f7; newpay.dd373.com=90ec3de0-5987-4495-932c-8cb19431ced3; goods.dd373.com=1d088add-bea1-4c21-bd83-401f6e009805; point.dd373.com=a6ece75d-05bb-4718-a481-275b349f2584; newuser.dd373.com=5e9556bd-e15a-4459-8775-eb83c48936e5; mission.dd373.com=bec05890-3fec-4429-982a-e9da1760024f; thirdbind.dd373.com=8d5e30fb-0419-402a-8492-99a551c61a06; imservice.dd373.com=1245034d-3ec8-45c0-aae7-1eb447016563");
+       // headers.put("Cookie","userName_cc=dd_itm4hbep; clientId=70d1f116-1ede-41d4-92f2-7091a357e280; loginToken=ac9fc61e-a372-4a2b-a4a5-1daf0edf64df; refreshToken=601b9900-daff-46d4-8262-3f4f4cecc294; login.dd373.com=85248d0b-c1e1-42f0-9fa0-659a0db1f5f7; newpay.dd373.com=90ec3de0-5987-4495-932c-8cb19431ced3; goods.dd373.com=1d088add-bea1-4c21-bd83-401f6e009805; point.dd373.com=a6ece75d-05bb-4718-a481-275b349f2584; newuser.dd373.com=5e9556bd-e15a-4459-8775-eb83c48936e5; mission.dd373.com=bec05890-3fec-4429-982a-e9da1760024f; thirdbind.dd373.com=8d5e30fb-0419-402a-8492-99a551c61a06; imservice.dd373.com=1245034d-3ec8-45c0-aae7-1eb447016563");
 //        //请求数据
 //        HashMap<String, String> data = new HashMap<String, String>();
 //        data.put("userName", "");
@@ -301,20 +303,47 @@ public class HttpRequest {
 //        System.out.println(post_text.getCookies()); //获取返回的cookie
 
 
-        //发送GET请求
-        HttpRequest gettext = new HttpRequest("网站", "GET");
-       // this.sendGet();
-        gettext.sendGet("https://newpay.dd373.com/Api/FundInfo/UserCenter/List", "StartDate=&EndDate=&Keyword=DH2022111620592453128&Classify=2&Type=0&PageSize=20&PageIndex=1", headers,
-                "userName_cc=dd_itm4hbep; clientId=70d1f116-1ede-41d4-92f2-7091a357e280; loginToken=ac9fc61e-a372-4a2b-a4a5-1daf0edf64df; refreshToken=601b9900-daff-46d4-8262-3f4f4cecc294;" +
-                        "SERVERID=892afa290ce7bed84795cafc25e9c37c|1669733446|1669733389;"+
-                        " login.dd373.com=85248d0b-c1e1-42f0-9fa0-659a0db1f5f7; newpay.dd373.com=90ec3de0-5987-4495-932c-8cb19431ced3; " +
-                        "goods.dd373.com=1d088add-bea1-4c21-bd83-401f6e009805; point.dd373.com=a6ece75d-05bb-4718-a481-275b349f2584; " +
-                        "newuser.dd373.com=5e9556bd-e15a-4459-8775-eb83c48936e5; mission.dd373.com=bec05890-3fec-4429-982a-e9da1760024f; " +
-                        "thirdbind.dd373.com=8d5e30fb-0419-402a-8492-99a551c61a06; imservice.dd373.com=1245034d-3ec8-45c0-aae7-1eb447016563");
+        HashMap<String, String> submitdata  = new HashMap<String, String>();;
+        submitdata.put("StartDate","");
+        submitdata.put("EndDate","");
+        submitdata.put("Keyword","DH2022111102052314082");
+        submitdata.put("Classify","2");
+        submitdata.put("Type","0");
+        submitdata.put("PageSize","20");
+        submitdata.put("PageIndex","1");
+
+        //String cookie = "userName_cc=dd_itm4hbep; clientId=70d1f116-1ede-41d4-92f2-7091a357e280; refreshToken=601b9900-daff-46d4-8262-3f4f4cecc294; loginToken=2ba66f10-7893-4e51-a2ff-07e22de5665b; newpay.dd373.com=b69117f2-9076-4ac1-a298-d04374f8c1d1; acw_tc=76b20fe916697417249981735e4f19e07f03b95afa13fbb2d7bdafd2b157d5;SERVERID=a278729d2ae086497be277567757b907|1669743724|1669741725;";
+        String cookie = "newCookie:uoken=2ba66f10-7374f8c1d1; ;SERVERID=892afa290ce7bed84795cafc25e9c37c|1669745974|1669745974";
+        HttpRequest gettext = new HttpRequest("https://newpay.dd373.com/Api/FundInfo/UserCenter/List", "GET",headers,cookie,submitdata);
+        StringBuffer sb = new StringBuffer();
+        String newCookie = "";
+        String requestCookie = gettext.getCookies();
+        String[] newCookies = requestCookie.split(";");
+        for (int i=0;i<newCookies.length;i++) {
+            if(newCookies[i].indexOf("SERVERID=")>-1){
+                newCookie = newCookies[i];
+            }
+        }
+        System.out.println("newCookie："+newCookie);
+        if(cookie.indexOf("SERVERID=")!=-1){
+            String[] cookies = cookie.split(";");
+            for (int i=0;i<cookies.length;i++) {
+                if(cookies[i].indexOf("SERVERID=")==-1){
+                    sb.append(cookies[i]+";");
+                }else{
+                    sb.append(newCookie+";");
+                }
+            }
+        }else{
+            sb.append(cookie+";");
+            sb.append(newCookie);
+        }
         System.out.println(gettext.getData());  //获取返回数据
         System.out.println(gettext.getCookies());  //返回cookie
+        System.out.println("oldCookie:"+cookie);  //返回cookie
+        System.out.println("newCookie:"+sb.toString());  //返回cookie
 
-    }
+    }*/
 }
 
 
