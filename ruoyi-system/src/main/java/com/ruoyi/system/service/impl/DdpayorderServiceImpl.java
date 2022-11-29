@@ -227,7 +227,14 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                  describe = (String) ob.get("Describe");// 订单说明
                 price = (BigDecimal) ob.get("Price");  //订单金额
             }
-           log.info( "----------------获取订单编号:"+OrderNo);
+
+            JSONArray payTypes = (JSONArray) resultData.get("PayTypes");
+            String payTypeId ="";
+            if(payTypes.size()>0){
+                JSONObject ob = (JSONObject) payTypes.get(0);//得到json对象
+                payTypeId =(String)  ob.get("Id");//支付类型Id
+            }
+           log.info( "----------------PayTypes——Id:"+payTypeId);
            //根據订单ID号 获取支付链接
            OrderLinkJson olj = new OrderLinkJson();
            olj.setOrderId(orderId);
@@ -238,7 +245,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
            olj.setPurpose("");
            olj.setSendWay(0);
            olj.setIsWap(true);
-           olj.setPayTypeId("12F3F41DE3124EAFB335FF571A9D164A");
+           olj.setPayTypeId(payTypeId);
            log.info( "----------------获取订单链接参数:"+olj.toString());
             String resorderPayLinkJson = "";
             try{
