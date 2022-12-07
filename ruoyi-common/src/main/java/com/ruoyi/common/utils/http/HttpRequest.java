@@ -180,6 +180,7 @@ public class HttpRequest {
             StringBuilder sessionId = new StringBuilder();
             String key = null;
             for (int i = 1; (key = conn.getHeaderFieldKey(i)) != null; i++) {
+                System.out.println(key + "-->" );
                 if (key.equalsIgnoreCase("set-cookie")) {
                     sessionId.append(conn.getHeaderField(i)).append(";");
                 }
@@ -278,7 +279,7 @@ public class HttpRequest {
         return this.data;
     }
 
-/*
+
     //测试发送GET和POST请求
     public static void main(String[] args) throws Exception {
         //发送POST请求
@@ -343,7 +344,7 @@ public class HttpRequest {
         System.out.println("oldCookie:"+cookie);  //返回cookie
         System.out.println("newCookie:"+sb.toString());  //返回cookie
 
-    }*/
+    }
 }
 
 
