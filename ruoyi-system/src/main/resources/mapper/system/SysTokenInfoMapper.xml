@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysTokenInfoMapper">
+    
+    <resultMap type="SysTokenInfo" id="SysTokenInfoResult">
+        <result property="id"    column="id"    />
+        <result property="shopId"    column="shopId"    />
+        <result property="username"    column="username"    />
+        <result property="queue"    column="queue"    />
+        <result property="backup"    column="backup"    />
+        <result property="cookie"    column="cookie"    />
+        <result property="createTime"    column="createTime"    />
+        <result property="updateTime"    column="updateTime"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="pwd"    column="pwd"    />
+    </resultMap>
+
+    <sql id="selectSysTokenInfoVo">
+        select id, shopId, username, queue, backup, cookie, createTime, updateTime, remarks, pwd from sys_token_info
+    </sql>
+
+    <select id="selectSysTokenInfoList" parameterType="SysTokenInfo" resultMap="SysTokenInfoResult">
+        <include refid="selectSysTokenInfoVo"/>
+        <where>  
+            <if test="shopId != null and shopId != ''"> and shopId = #{shopId}</if>
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="queue != null "> and queue = #{queue}</if>
+            <if test="backup != null  and backup != ''"> and backup = #{backup}</if>
+            <if test="cookie != null  and cookie != ''"> and cookie = #{cookie}</if>
+            <if test="createTime != null "> and createTime = #{createTime}</if>
+            <if test="updateTime != null "> and updateTime = #{updateTime}</if>
+            <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
+            <if test="pwd != null  and pwd != ''"> and pwd = #{pwd}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysTokenInfoById" parameterType="Long" resultMap="SysTokenInfoResult">
+        <include refid="selectSysTokenInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysTokenInfo" parameterType="SysTokenInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_token_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shopId != null">shopId,</if>
+            <if test="username != null">username,</if>
+            <if test="queue != null">queue,</if>
+            <if test="backup != null">backup,</if>
+            <if test="cookie != null">cookie,</if>
+            <if test="createTime != null">createTime,</if>
+            <if test="updateTime != null">updateTime,</if>
+            <if test="remarks != null">remarks,</if>
+            <if test="pwd != null">pwd,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shopId != null">#{shopId},</if>
+            <if test="username != null">#{username},</if>
+            <if test="queue != null">#{queue},</if>
+            <if test="backup != null">#{backup},</if>
+            <if test="cookie != null">#{cookie},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remarks != null">#{remarks},</if>
+            <if test="pwd != null">#{pwd},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysTokenInfo" parameterType="SysTokenInfo">
+        update sys_token_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="shopId != null">shopId = #{shopId},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="queue != null">queue = #{queue},</if>
+            <if test="backup != null">backup = #{backup},</if>
+            <if test="cookie != null">cookie = #{cookie},</if>
+            <if test="createTime != null">createTime = #{createTime},</if>
+            <if test="updateTime != null">updateTime = #{updateTime},</if>
+            <if test="remarks != null">remarks = #{remarks},</if>
+            <if test="pwd != null">pwd = #{pwd},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysTokenInfoById" parameterType="Long">
+        delete from sys_token_info where id = #{id}
+    </delete>
+
+    <delete id="deleteSysTokenInfoByIds" parameterType="String">
+        delete from sys_token_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

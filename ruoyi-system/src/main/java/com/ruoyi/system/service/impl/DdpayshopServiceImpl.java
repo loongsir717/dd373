@@ -64,7 +64,7 @@ public class DdpayshopServiceImpl implements IDdpayshopService
     public int insertDdpayshop(Ddpayshop ddpayshop)
     {
         ddpayshop.setCreateTime(DateUtils.getNowDate());
-        ddpayshop = getShopInfo(ddpayshop);
+       // ddpayshop = getShopInfo(ddpayshop);
         if(StringUtils.isEmpty(ddpayshop.getAppid())){
             return 0;
         }
@@ -81,25 +81,14 @@ public class DdpayshopServiceImpl implements IDdpayshopService
     public int updateDdpayshop(Ddpayshop ddpayshop)
     {
         ddpayshop.setUpdateTime(DateUtils.getNowDate());
-
         return ddpayshopMapper.updateDdpayshop(ddpayshop);
     }
 
     @Override
     public AjaxResult updateshop(Ddpayshop ddpayshop) {
-
-        String appid = ddpayshop.getAppid();
-        if(ddpayshop.getStatus()==0){
-            ddpayshop = getShopInfo(ddpayshop);
-        }
-        if(ddpayshop !=null){
-            if(!appid.equals(ddpayshop.getAppid())){
-                return AjaxResult.error("不同手机号的Cookie");
-            }
-            int count = ddpayshopMapper.updateDdpayshop(ddpayshop);
-            if(count>0){
-                return AjaxResult.success();
-            }
+        int count = ddpayshopMapper.updateDdpayshop(ddpayshop);
+        if(count>0){
+            return AjaxResult.success();
         }
         return AjaxResult.error("Cookie失效");
     }

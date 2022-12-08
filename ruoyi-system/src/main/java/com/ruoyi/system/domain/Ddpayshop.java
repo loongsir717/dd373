@@ -26,17 +26,15 @@ public class Ddpayshop extends BaseEntity
     @Excel(name = "appid")
     private String appid;
 
-//    /** clientid */
-//    @Excel(name = "clientid")
-//    private String clientid;
-//
-//    /** clientsec */
-//    @Excel(name = "clientsec")
-//    private String clientsec;
-//
-//    /** msg_token */
-//    @Excel(name = "msg_token")
-//    private String msgToken;
+    /** clientid */
+    @Excel(name = "clientid")
+    private String clientid;
+
+    /** clientsec */
+    @Excel(name = "clientsec")
+    private String clientsec;
+
+
 
     /** cookie */
     @Excel(name = "cookie")
@@ -109,24 +107,24 @@ public class Ddpayshop extends BaseEntity
     {
         return appid;
     }
-//    public void setClientid(String clientid)
-//    {
-//        this.clientid = clientid;
-//    }
-//
-//    public String getClientid()
-//    {
-//        return clientid;
-//    }
-//    public void setClientsec(String clientsec)
-//    {
-//        this.clientsec = clientsec;
-//    }
-//
-//    public String getClientsec()
-//    {
-//        return clientsec;
-//    }
+    public void setClientid(String clientid)
+    {
+        this.clientid = clientid;
+    }
+
+    public String getClientid()
+    {
+        return clientid;
+    }
+    public void setClientsec(String clientsec)
+    {
+        this.clientsec = clientsec;
+    }
+
+    public String getClientsec()
+    {
+        return clientsec;
+    }
 //    public void setMsgToken(String msgToken)
 //    {
 //        this.msgToken = msgToken;
@@ -242,8 +240,8 @@ public class Ddpayshop extends BaseEntity
             .append("id", getId())
             .append("name", getName())
             .append("appid", getAppid())
-//            .append("clientid", getClientid())
-//            .append("clientsec", getClientsec())
+            .append("clientid", getClientid())
+            .append("clientsec", getClientsec())
 //            .append("msgToken", getMsgToken())
             .append("cookie", getCookie())
 //            .append("key", getKey())

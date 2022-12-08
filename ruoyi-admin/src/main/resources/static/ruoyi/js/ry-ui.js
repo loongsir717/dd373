@@ -1141,6 +1141,11 @@ var table = {
                 table.set();
                 $.modal.open("添加" + table.options.modalName, $.operate.addUrl(id));
             },
+
+            batchAdd: function() {
+                table.set();
+                $.modal.open("添加" + table.options.modalName, $.operate.batchAddUrl());
+            },
             // 添加信息，以tab页展现
             addTab: function (id) {
                 table.set();
@@ -1155,6 +1160,10 @@ var table = {
             addUrl: function(id) {
                 var url = $.common.isEmpty(id) ? table.options.createUrl.replace("{id}", "") : table.options.createUrl.replace("{id}", id);
                 return url;
+            },
+            // 添加访问地址
+            batchAddUrl: function(id) {
+                return table.options.batchAddUrl;
             },
             // 修改信息
             edit: function(id) {

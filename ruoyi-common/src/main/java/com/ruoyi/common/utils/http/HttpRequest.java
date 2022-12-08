@@ -315,7 +315,7 @@ public class HttpRequest {
 
         //String cookie = "userName_cc=dd_itm4hbep; clientId=70d1f116-1ede-41d4-92f2-7091a357e280; refreshToken=601b9900-daff-46d4-8262-3f4f4cecc294; loginToken=2ba66f10-7893-4e51-a2ff-07e22de5665b; newpay.dd373.com=b69117f2-9076-4ac1-a298-d04374f8c1d1; acw_tc=76b20fe916697417249981735e4f19e07f03b95afa13fbb2d7bdafd2b157d5;SERVERID=a278729d2ae086497be277567757b907|1669743724|1669741725;";
         String cookie = "newCookie:uoken=2ba66f10-7374f8c1d1; ;SERVERID=892afa290ce7bed84795cafc25e9c37c|1669745974|1669745974";
-        HttpRequest gettext = new HttpRequest("https://newpay.dd373.com/Api/FundInfo/UserCenter/List", "GET",headers,cookie,submitdata);
+        HttpRequest gettext = new HttpRequest("https://openapi.alipay.com/gateway.do?charset=UTF-8", "POST",headers,cookie,submitdata);
         StringBuffer sb = new StringBuffer();
         String newCookie = "";
         String requestCookie = gettext.getCookies();

@@ -381,4 +381,42 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         }
         return callbackJson;
     }
+
+
+    @Override
+    public AjaxResult craeteOrderNo(Ddpayorder ddpayorder, String type) {
+         //1、登录   {"account":"18670055200","password":"123qwe"}
+         String loginUrl = "http://h5.mall2.yingliao.tv/api/login";
+
+        //String objJson = HttpUtils.sendGet(loginUrl, param, Constants.UTF8,cookie);
+
+        //2、查询商品列表  URL  http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8  get
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8";
+        //3、获取商品详情  URL  http://h5.mall2.yingliao.tv/api/product/detail/{orderid} get
+        String queryGoodsdetailsUrl = "http://h5.mall2.yingliao.tv/api/product/detail/";
+        //4、加入购物车  URL   http://h5.mall2.yingliao.tv/api/cart/add post           {"productId":"4","cartNum":1,"new":1,"uniqueId":"1e734f6b","virtual_type":0}
+        String addCartUrl = " http://h5.mall2.yingliao.tv/api/cart/add";
+        //5、确认订单信息  URL  http://h5.mall2.yingliao.tv/api/order/check_shipping  post   {"cartId":"4332171792833576960","new":1}
+        String checkShippingUrl = "http://h5.mall2.yingliao.tv/api/order/check_shipping";
+        //6、确认订单价格  URL   http://h5.mall2.yingliao.tv/api/coupons/order/0.01?cartId=4332171792833576960&new=1&shippingType=1  get
+        String couponsOrderUrl = "http://h5.mall2.yingliao.tv/api/coupons/order/";
+        //7、提交订单信息  URL   http://h5.mall2.yingliao.tv/api/order/confirm  post         {"cartId":"4332172211529973760","new":1,"addressId":0,"shipping_type":1}
+        String confirmOrderUrl = "http://h5.mall2.yingliao.tv/api/order/confirm";
+        //8、创建订单  URL    http://h5.mall2.yingliao.tv/api/order/create/{购物车id}  post
+        // {"custom_form":[],"real_name":"咯嘛呢","phone":"18670055200","addressId":2,"formId":"","couponId":0,"payType":"alipay","useIntegral":false,"bargainId":0,"combinationId":0,"discountId":null,"pinkId":0,"advanceId":0,"seckill_id":0,"mark":"","from":"weixinh5","shipping_type":1,"new":1,"invoice_id":"","quitUrl":"http://h5.mall2.yingliao.tv/pages/goods/order_pay_status/index?&type=3&totalPrice=0.01"}
+        String createOrderUrl =  "http://h5.mall2.yingliao.tv/api/order/create/";
+        //9、验证订单orderkey  URL  http://h5.mall2.yingliao.tv/api/order/computed/{购物车id}  post   {"addressId":2,"useIntegral":0,"couponId":0,"shipping_type":1,"payType":"weixin"}
+        String orderkeyUrl = "http://h5.mall2.yingliao.tv/api/order/computed";
+        //10、订单支付接口  URL  http://h5.mall.yingliao.tv/api/order/pay  post
+           /* {
+                "uni": "cp330027658781917184",
+                    "paytype": "alipay",
+                    "type": 0,
+                    "from": "weixinh5",
+                    "quitUrl": "http://h5.mall.yingliao.tv/pages/goods/order_details/index?order_id=cp330027658781917184"
+            }*/
+        String orderPayUrl = "http://h5.mall.yingliao.tv/api/order/pay";
+
+        return null;
+    }
 }

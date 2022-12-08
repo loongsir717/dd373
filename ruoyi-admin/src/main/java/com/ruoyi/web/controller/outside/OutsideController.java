@@ -37,9 +37,9 @@ public class OutsideController extends BaseController {
      * @param ddpayorder
      * @return
      */
-    @PostMapping("/createOrder")
+    @PostMapping("/createDdOrder")
     @ResponseBody
-    public AjaxResult createOrder(Ddpayorder ddpayorder){
+    public AjaxResult createDdOrder(Ddpayorder ddpayorder){
         String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbackUrl()+
                 ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
         logger.info("afterSign:"+afterSign);
@@ -73,5 +73,44 @@ public class OutsideController extends BaseController {
             }
         }
     }
+
+
+    @PostMapping("/createOrder")
+    @ResponseBody
+    public AjaxResult createOrder(Ddpayorder ddpayorder){
+        String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbackUrl()+
+                ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
+        logger.info("afterSign:"+afterSign);
+        String sign = Md5Utils.hash(afterSign).toUpperCase();
+        logger.info("sign:"+sign);
+        if(!sign.equals(ddpayorder.getSign())){
+            return new AjaxResult(AjaxResult.Type.ERROR,"验签失败！","");
+        }else{
+            return ddpayorderService.craeteOrderNo(ddpayorder,"Shop");
+        }
+    }
+
+    @PostMapping("/queryShopOrder")
+    @ResponseBody
+    public AjaxResult queryShopOrder(Ddpayorder ddpayorder){
+        String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getOrderId()+
+                ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
+        logger.info("afterSign:"+afterSign);
+        String sign = Md5Utils.hash(afterSign).toUpperCase();
+        logger.info("sign1:"+sign);
+        logger.info("sign2:"+ddpayorder.getSign());
+        if(!sign.equals(ddpayorder.getSign())){
+            return new AjaxResult(AjaxResult.Type.ERROR,"验签失败！","");
+        }else{
+            Ddpayorder order = ddpayorderService.queryOrder(ddpayorder);
+            if(order == null|| order.getId() == null){
+                return new AjaxResult(AjaxResult.Type.ERROR,"未找到对应订单！","");
+            }else{
+                return new AjaxResult(AjaxResult.Type.SUCCESS,"",order.getStatus());
+            }
+        }
+    }
+
+
 
 }

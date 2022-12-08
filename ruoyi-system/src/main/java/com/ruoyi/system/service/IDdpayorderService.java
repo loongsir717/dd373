@@ -70,6 +70,9 @@ public interface IDdpayorderService
     public AjaxResult craeteOrderNo(Ddpayorder ddpayorder);
 
 
+    public AjaxResult craeteOrderNo(Ddpayorder ddpayorder,String type);
+
+
     /**
      * 根据订单号查询充值是否成功，成功后回调
      * @return

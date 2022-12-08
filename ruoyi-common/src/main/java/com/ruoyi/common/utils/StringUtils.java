@@ -1,11 +1,8 @@
 package com.ruoyi.common.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.springframework.util.AntPathMatcher;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.text.StrFormatter;
@@ -627,4 +624,76 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
         }
         return sb.toString();
     }
+
+    public static String getIdNo(boolean male){
+        //随机生成生日 1~99岁
+        long begin = System.currentTimeMillis() - 3153600000000L;//100年内
+        long end = System.currentTimeMillis() - 31536000000L; //1年内
+        long rtn = begin + (long) (Math.random() * (end - begin));
+        Date date = new Date(rtn);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        String birth = simpleDateFormat.format(date);
+        return getIdNo(birth,male);
+    }
+    public static String getIdNo(String birth,boolean male){
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        int value = random.nextInt(Cities.cities.length);
+        sb.append(Cities.cities[value]);
+        sb.append(birth);
+        value = random.nextInt(999) + 1;
+        if(male && value % 2 == 0){
+            value++;
+        }
+        if(!male && value % 2 == 1){
+            value++;
+        }
+        if(value >= 100){
+            sb.append(value);
+        }else if(value >= 10){
+            sb.append('0').append(value);
+        }else{
+            sb.append("00").append(value);
+        }
+        sb.append(calcTrailingNumber(sb));
+        return sb.toString();
+    }
+    private static final int[] calcC = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+    private static final char[] calcR = { '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2' };
+
+    private static char calcTrailingNumber(StringBuilder sb) {
+        int[] n = new int[17];
+        int result = 0;
+        for (int i = 0; i < n.length; i++) {
+            n[i] = Integer.parseInt(String.valueOf(sb.charAt(i)));
+        }
+        for (int i = 0; i < n.length; i++) {
+            result += calcC[i] * n[i];
+        }
+        return calcR[result % 11];
+    }
+
+
+    public static String getPhoneNum() {
+        String[] Top3 = {"133", "149", "153", "173", "177",
+                "180", "181", "189", "199", "130", "131", "132",
+                "145", "155", "156", "166", "171", "175", "176", "185", "186", "166", "134", "135",
+                "136", "137", "138", "139", "147", "150", "151", "152", "157", "158", "159", "172",
+                "178", "182", "183", "184", "187", "188", "198", "170", "171"};
+        //随机出真实号段   使用数组的length属性，获得数组长度，
+        //通过Math.random（）*数组长度获得数组下标，从而随机出前三位的号段
+        String firstNum = Top3[(int) (Math.random() * Top3.length)];
+        //随机出剩下的8位数
+        String lastNum = "";
+        final int last = 8;
+        for (int i = 0; i < last; i++) {
+            //每次循环都从0~9挑选一个随机数
+            lastNum += (int) (Math.random() * 10);
+        }
+        //最终将号段和尾数连接起来
+        String phoneNum = firstNum+ lastNum;
+        return phoneNum;
+    }
+
+
 }

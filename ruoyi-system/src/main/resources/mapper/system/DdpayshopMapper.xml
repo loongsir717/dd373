@@ -8,8 +8,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="name"    column="name"    />
         <result property="appid"    column="appid"    />
-<!--        <result property="clientid"    column="clientid"    />-->
-<!--        <result property="clientsec"    column="clientsec"    />-->
+        <result property="clientid"    column="clientid"    />
+        <result property="clientsec"    column="clientsec"    />
 <!--        <result property="msgToken"    column="msg_token"    />-->
         <result property="cookie"    column="cookie"    />
 <!--        <result property="key"    column="key"    />-->
@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectDdpayshopVo">
-        select id, name, appid, cookie,payMethod, cookieExpire, cookieCount, cookieMaxOrder, status, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayshop
+        select id, name, appid,clientid,clientsec,cookie,payMethod, cookieExpire, cookieCount, cookieMaxOrder, status, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayshop
     </sql>
 
     <select id="selectDdpayshopList" parameterType="Ddpayshop" resultMap="DdpayshopResult">
@@ -37,8 +37,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="appid != null  and appid != ''"> and appid = #{appid}</if>
-<!--            <if test="clientid != null  and clientid != ''"> and clientid = #{clientid}</if>-->
-<!--            <if test="clientsec != null  and clientsec != ''"> and clientsec = #{clientsec}</if>-->
+            <if test="clientid != null  and clientid != ''"> and clientid = #{clientid}</if>
+            <if test="clientsec != null  and clientsec != ''"> and clientsec = #{clientsec}</if>
 <!--            <if test="msgToken != null  and msgToken != ''"> and msg_token = #{msgToken}</if>-->
             <if test="cookie != null  and cookie != ''"> and cookie = #{cookie}</if>
 <!--            <if test="key != null  and key != ''"> and key = #{key}</if>-->
@@ -74,8 +74,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null">name,</if>
             <if test="appid != null">appid,</if>
-<!--            <if test="clientid != null">clientid,</if>-->
-<!--            <if test="clientsec != null">clientsec,</if>-->
+            <if test="clientid != null">clientid,</if>
+            <if test="clientsec != null">clientsec,</if>
 <!--            <if test="msgToken != null">msg_token,</if>-->
             <if test="cookie != null">cookie,</if>
 <!--            <if test="key != null">key,</if>-->
@@ -96,8 +96,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null">#{name},</if>
             <if test="appid != null">#{appid},</if>
-<!--            <if test="clientid != null">#{clientid},</if>-->
-<!--            <if test="clientsec != null">#{clientsec},</if>-->
+            <if test="clientid != null">#{clientid},</if>
+            <if test="clientsec != null">#{clientsec},</if>
 <!--            <if test="msgToken != null">#{msgToken},</if>-->
             <if test="cookie != null">#{cookie},</if>
 <!--            <if test="key != null">#{key},</if>-->
@@ -122,8 +122,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null">name = #{name},</if>
             <if test="appid != null">appid = #{appid},</if>
-<!--            <if test="clientid != null">clientid = #{clientid},</if>-->
-<!--            <if test="clientsec != null">clientsec = #{clientsec},</if>-->
+            <if test="clientid != null">clientid = #{clientid},</if>
+            <if test="clientsec != null">clientsec = #{clientsec},</if>
 <!--            <if test="msgToken != null">msg_token = #{msgToken},</if>-->
             <if test="cookie != null">cookie = #{cookie},</if>
 <!--            <if test="key != null">key = #{key},</if>-->
