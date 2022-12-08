@@ -113,27 +113,26 @@ public class SysTokenInfoController extends BaseController
     @Log(title = "TokenInfo", businessType = BusinessType.INSERT)
     @GetMapping("/batchAdd")
     @ResponseBody
-    public AjaxResult batchAddSave(SysTokenInfo sysTokenInfo)
-    {
+    public AjaxResult batchAddSave(SysTokenInfo sysTokenInfo) throws InterruptedException {
         //管理员登录
         String url = "http://h5.mall2.yingliao.tv/adminapi/login";
         List<Ddpayshop> ddpayshops = iDdpayshopService.selectDdpayshopList(new Ddpayshop());
         int count = 0;
         for (Ddpayshop shop:ddpayshops) {
-            String postdata = "{\"account\":\""+shop.getClientid()+"\",\"pwd\":\""+shop.getClientsec()+"\"}";
-            String objJson = HttpUtils.doHttpPost(url,postdata,"application/json",null);
-            if(StringUtils.isEmpty(objJson)){
-                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
-            }
-            log.info( "----------------返回值:"+objJson);
-            JSONObject resultJson  = JSONObject.parseObject(objJson);
-            JSONObject resultDataJson = (JSONObject) resultJson.get("data");
-            String resultDataTokenJson = (String) resultDataJson.get("token");
             for(int i=0;i<10;i++){
+                String tokenPostdata = "{\"account\":\""+shop.getClientid()+"\",\"pwd\":\""+shop.getClientsec()+"\"}";
+                String objJson = HttpUtils.doHttpPost(url,tokenPostdata,"application/json",null);
+                if(StringUtils.isEmpty(objJson)){
+                    return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+                }
+                log.info( "----------------返回值:"+objJson);
+                JSONObject resultJson  = JSONObject.parseObject(objJson);
+                JSONObject resultDataJson = (JSONObject) resultJson.get("data");
+                String resultDataTokenJson = "Bearer "+ resultDataJson.get("token");
                 StringUtils.getIdNo(true);
                 String phone = StringUtils.getPhoneNum();
                 String pwd = "123qwe";
-                String postData = "{" +
+                String createPostData = "{" +
                         "    \"uid\": 0," +
                         "    \"real_name\": \"1\"," +
                         "    \"phone\": \""+phone+"\"," +
@@ -150,11 +149,13 @@ public class SysTokenInfoController extends BaseController
                         "    \"is_promoter\": 0," +
                         "    \"status\": 1" +
                         "}";
-                String resultcreateUser =HttpUtils.doHttpPost(url,postdata,"application/json",resultDataTokenJson);
-                if(StringUtils.isEmpty(objJson)){
+                log.info("Token = "+ resultDataTokenJson);
+
+                String resultcreateUser =HttpUtils.doHttpPost(url,createPostData,"application/json",resultDataTokenJson);
+                if(StringUtils.isEmpty(resultcreateUser)){
                     return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
                 }
-                log.info( "----------------返回值:"+objJson);
+                log.info( "----------------返回值:"+resultcreateUser);
                 JSONObject resultUser  = JSONObject.parseObject(resultcreateUser);
                 String status = resultUser.get("status")+"";
                 if("200".equals(status)){
@@ -168,7 +169,7 @@ public class SysTokenInfoController extends BaseController
                     sysTokenInfoService.insertSysTokenInfo(tokenInfo);
                     count++;
                 }
-
+                Thread.sleep(5000);
             }
         }
         return toAjax(count);

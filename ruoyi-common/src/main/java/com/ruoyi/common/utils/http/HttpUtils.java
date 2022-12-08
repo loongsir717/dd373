@@ -348,7 +348,7 @@ public class HttpUtils
             conn.setRequestProperty("Content-Type", contentType);
             conn.setRequestProperty("contentType", "UTF-8");
             if(StringUtils.isNotEmpty(cookie)){
-                conn.setRequestProperty("cookie", cookie);
+               // conn.setRequestProperty("cookie", cookie);
             }
             if(StringUtils.isNotEmpty(cookie)){
                 conn.setRequestProperty("Authori-zation", cookie);
