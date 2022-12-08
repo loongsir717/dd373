@@ -115,20 +115,20 @@ public class SysTokenInfoController extends BaseController
     @ResponseBody
     public AjaxResult batchAddSave(SysTokenInfo sysTokenInfo) throws InterruptedException {
         //管理员登录
-        String url = "http://h5.mall2.yingliao.tv/adminapi/login";
+        String tokenUrl = "http://h5.mall2.yingliao.tv/adminapi/login";
         List<Ddpayshop> ddpayshops = iDdpayshopService.selectDdpayshopList(new Ddpayshop());
         int count = 0;
         for (Ddpayshop shop:ddpayshops) {
+            String tokenPostdata = "{\"account\":\""+shop.getClientid()+"\",\"pwd\":\""+shop.getClientsec()+"\"}";
+            String objJson = HttpUtils.doHttpPost(tokenUrl,tokenPostdata,"application/json",null);
+            if(StringUtils.isEmpty(objJson)){
+                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+            }
+            log.info( "----------------返回值:"+objJson);
+            JSONObject resultJson  = JSONObject.parseObject(objJson);
+            JSONObject resultDataJson = (JSONObject) resultJson.get("data");
+            String resultDataTokenJson = "Bearer "+ resultDataJson.get("token");
             for(int i=0;i<10;i++){
-                String tokenPostdata = "{\"account\":\""+shop.getClientid()+"\",\"pwd\":\""+shop.getClientsec()+"\"}";
-                String objJson = HttpUtils.doHttpPost(url,tokenPostdata,"application/json",null);
-                if(StringUtils.isEmpty(objJson)){
-                    return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
-                }
-                log.info( "----------------返回值:"+objJson);
-                JSONObject resultJson  = JSONObject.parseObject(objJson);
-                JSONObject resultDataJson = (JSONObject) resultJson.get("data");
-                String resultDataTokenJson = "Bearer "+ resultDataJson.get("token");
                 StringUtils.getIdNo(true);
                 String phone = StringUtils.getPhoneNum();
                 String pwd = "123qwe";
@@ -150,8 +150,8 @@ public class SysTokenInfoController extends BaseController
                         "    \"status\": 1" +
                         "}";
                 log.info("Token = "+ resultDataTokenJson);
-
-                String resultcreateUser =HttpUtils.doHttpPost(url,createPostData,"application/json",resultDataTokenJson);
+                String craeteUserUrl = "http://h5.mall2.yingliao.tv/adminapi/user/user";
+                String resultcreateUser =HttpUtils.doHttpPost(craeteUserUrl,createPostData,"application/json",resultDataTokenJson);
                 if(StringUtils.isEmpty(resultcreateUser)){
                     return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
                 }
@@ -169,7 +169,7 @@ public class SysTokenInfoController extends BaseController
                     sysTokenInfoService.insertSysTokenInfo(tokenInfo);
                     count++;
                 }
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             }
         }
         return toAjax(count);
