@@ -504,7 +504,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String createOrderPostDate = "{\"custom_form\":[]," +
                 "\"real_name\":\""+sysTokenInfo.getUsername()+"\"," +
                 "\"phone\":\""+sysTokenInfo.getUsername()+"\"," +
-                "\"addressId\":"+sysTokenInfo.getUserAdderss()+"," +
+                "\"addressId\":"+adderssId+"," +
                 "\"formId\":\"\",\"couponId\":0," +
                 "\"payType\":\"alipay\"," +
                 "\"useIntegral\":false,\"bargainId\":0,\"combinationId\":0,\"discountId\":null,\"pinkId\":0,\"advanceId\":0,\"seckill_id\":0,\"mark\":\"\",\"from\":\"weixinh5\",\"shipping_type\":1,\"new\":1,\"invoice_id\":\"\"," +
