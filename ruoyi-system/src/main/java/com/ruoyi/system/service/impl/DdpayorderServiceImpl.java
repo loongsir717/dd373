@@ -455,6 +455,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         if(StringUtils.isEmpty(resultaddCarStr)){
             return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品详情失敗",null);
         }
+        log.info( "----加入购物车---参数:"+resultaddCarStr);
         log.info( "----加入购物车---返回值:"+resultaddCarStr);
         JSONObject addCarObj  = JSONObject.parseObject(resultaddCarStr);
         JSONObject addCarJson = (JSONObject) addCarObj.get("data");
@@ -472,12 +473,13 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String confirmOrderUrl = "http://h5.mall2.yingliao.tv/api/order/confirm";
         String confirmOrderPostDate = "{\"cartId\":\""+cartId+"\"," +
                 "\"new\":1," +
-                "\"addressId\":"+sysTokenInfo.getUserAdderss()+"," +
+                "\"addressId\":"+adderssId+"," +
                 "\"shipping_type\":1}";
         String resultConfirmOrderStr  = HttpUtils.doHttpPost(confirmOrderUrl,confirmOrderPostDate,"application/json",cookie);
         if(StringUtils.isEmpty(resultConfirmOrderStr)){
             return new AjaxResult(AjaxResult.Type.ERROR,"提交订单失败",null);
         }
+        log.info( "----提交订单---参数："+resultConfirmOrderStr);
         log.info( "----提交订单---返回值:"+resultConfirmOrderStr);
         JSONObject confirmOrderObj  = JSONObject.parseObject(resultConfirmOrderStr);
         JSONObject confirmOrderData = (JSONObject) confirmOrderObj.get("data");
@@ -488,18 +490,16 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String orderkeyPostDate = "{\"addressId\":"+adderssId+",\"useIntegral\":0,\"couponId\":0,\"shipping_type\":1,\"payType\":\"alipay\"}";
         String resultorderkeyStr  = HttpUtils.doHttpPost(orderkeyUrl,orderkeyPostDate,"application/json",cookie);
         if(StringUtils.isEmpty(resultorderkeyStr)){
-            return new AjaxResult(AjaxResult.Type.ERROR,"提交订单失败",null);
+            return new AjaxResult(AjaxResult.Type.ERROR,"验证订单失败",null);
         }
-        log.info( "----提交订单---返回值:"+resultorderkeyStr);
+        log.info( "----验证订单---参数："+orderkeyPostDate);
+        log.info( "----验证订单---返回值:"+resultorderkeyStr);
         JSONObject orderkeyObj  = JSONObject.parseObject(resultorderkeyStr);
         Integer status = orderkeyObj.getInteger("status");
         if(200 != status){
             return new AjaxResult(AjaxResult.Type.ERROR,"创建订单失败",null);
         }
-
-
         //9、创建订单  URL    http://h5.mall2.yingliao.tv/api/order/create/{orderkey}  post
-        //
         String createOrderUrl =  "http://h5.mall2.yingliao.tv/api/order/create/"+orderKey;
         String createOrderPostDate = "{\"custom_form\":[]," +
                 "\"real_name\":\""+sysTokenInfo.getUsername()+"\"," +
@@ -513,6 +513,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         if(StringUtils.isEmpty(resultcreateOrderPostDateStr)){
             return new AjaxResult(AjaxResult.Type.ERROR,"提交订单失败",null);
         }
+        log.info( "----创建订单---参数："+createOrderPostDate);
         log.info( "----创建订单---返回值:"+resultcreateOrderPostDateStr);
 
         JSONObject createOrderObj  = JSONObject.parseObject(resultcreateOrderPostDateStr);
@@ -531,7 +532,17 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         ddpayorder.setOrderId(orderId);  //订单号
         ddpayorder.setMethod(statusData); //支付方式
         ddpayorder.setOrderKey(key);    //orderkey
-        ddpayorder.setResult(jsConfig);//返回结果
+        ddpayorder.setBody(jsConfig);//返回结果
+        ddpayorder.setMethod("Alipay");
+        ddpayorder.setCreateTime(new Date());
+        ddpayorder.setUpdateTime(new Date());
+        ddpayorder.setAppid(sysTokenInfo.getShopId());
+        ddpayorder.setName(sysTokenInfo.getUsername());
+        ddpayorder.setPhone(sysTokenInfo.getUsername());
+        ddpayorderMapper.insertDdpayorder(ddpayorder);
+
+
+
 
         //10、订单支付接口  URL  http://h5.mall.yingliao.tv/api/order/pay  post
            /* {
@@ -543,7 +554,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             }*/
         String orderPayUrl = "http://h5.mall.yingliao.tv/api/order/pay";
 
-        return new AjaxResult(AjaxResult.Type.SUCCESS,"成功",jsConfig);
+        return new AjaxResult(AjaxResult.Type.SUCCESS,"成功","http://localhost:8088/outside/order/payOrder/"+ddpayorder.getOrderId()+"_"+ddpayorder.getMerchantOrderNo()+"_"+ddpayorder.getAmount());
     }
 
 }

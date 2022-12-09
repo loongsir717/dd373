@@ -12,11 +12,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -110,6 +108,19 @@ public class OutsideController extends BaseController {
                 return new AjaxResult(AjaxResult.Type.SUCCESS,"",order.getStatus());
             }
         }
+    }
+
+
+    @GetMapping("/payOrder/{id}")
+    public String payOrder(@PathVariable("id") String id)
+    {
+        String[] ids = id.split("_");
+        Ddpayorder ddpayorder = new Ddpayorder();
+        ddpayorder.setOrderId(ids[0]);
+        ddpayorder.setMerchantOrderNo(ids[1]);
+        ddpayorder.setAmount(new BigDecimal(ids[2]));
+        ddpayorder = ddpayorderService.queryOrder(ddpayorder);
+        return ddpayorder.getBody();
     }
 
 

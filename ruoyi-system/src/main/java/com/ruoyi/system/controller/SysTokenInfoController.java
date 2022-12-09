@@ -185,7 +185,7 @@ public class SysTokenInfoController extends BaseController
                             "        \"district\": \"南山区\",\n" +
                             "        \"city_id\": 151830\n" +
                             "    },\n" +
-                            "    \"is_default\": 1\n" +
+                            "    \"is_default\": 0\n" +
                             "}";
                     String resultcreateUserAdderss =HttpUtils.doHttpPost(createUserAdderssUrl,adderssPostData,"application/json",resultloginDataTokenJson);
                     if(StringUtils.isEmpty(resultcreateUserAdderss)){
@@ -199,7 +199,7 @@ public class SysTokenInfoController extends BaseController
                     tokenInfo.setUsername(phone);
                     tokenInfo.setPwd(pwd);
                     tokenInfo.setUserAdderss(addId);
-                    tokenInfo.setCookie(resultDataTokenJson);
+                    tokenInfo.setCookie(resultloginDataTokenJson);
                     tokenInfo.setShopId(shop.getAppid());
                     tokenInfo.setCreateTime(new Date());
                     tokenInfo.setUpdateTime(new Date());
