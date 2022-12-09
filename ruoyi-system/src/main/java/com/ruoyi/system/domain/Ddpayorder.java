@@ -103,6 +103,16 @@ public class Ddpayorder extends BaseEntity
 
     private  String sign;
 
+    private  String orderKey;
+
+    public String getOrderKey() {
+        return orderKey;
+    }
+
+    public void setOrderKey(String orderKey) {
+        this.orderKey = orderKey;
+    }
+
     private  String timestamps;
 
     public static long getSerialVersionUID() {
@@ -344,6 +354,7 @@ public class Ddpayorder extends BaseEntity
                 .append("result", getResult())
                 .append("invalidTime", getInvalidTime())
                 .append("status", getStatus())
+                .append("orderKey", getOrderKey())
                 .append("callbakUrl", getCallbackUrl())
                 .append("callbakStatus", getCallbackStatus())
                 .append("merchantOrderNo", getMerchantOrderNo())

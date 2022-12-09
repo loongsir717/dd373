@@ -3,6 +3,7 @@ package com.ruoyi.system.controller;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -33,7 +34,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * TokenInfoController
- * 
+ *
  * @author ruoyi
  * @date 2022-12-08
  */
@@ -48,7 +49,7 @@ public class SysTokenInfoController extends BaseController
 
     @Autowired
     private IDdpayshopService iDdpayshopService;
-    private static final Logger log = LoggerFactory.getLogger(DdpayorderServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SysTokenInfoController.class);
 
     @RequiresPermissions("system:tokenInfo:view")
     @GetMapping()
@@ -160,9 +161,45 @@ public class SysTokenInfoController extends BaseController
                 String status = resultUser.get("status")+"";
                 if("200".equals(status)){
                   log.info("创建成功~！ 手机号："+phone+";");
-                   SysTokenInfo tokenInfo = new SysTokenInfo();
+
+                    String loginUrl = "http://h5.mall2.yingliao.tv/api/login";
+                    String postDate = " {\"account\":\""+phone+"\",\"password\":\""+pwd+"\"}";
+                    String loginJson = HttpUtils.doHttpPost(loginUrl,postDate,"application/json",null);
+                    if(StringUtils.isEmpty(loginJson)){
+                        return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+                    }
+                    log.info( "----------------返回值:"+loginJson);
+                    JSONObject resultloginson  = JSONObject.parseObject(loginJson);
+                    JSONObject resultloginDataJson = (JSONObject) resultloginson.get("data");
+                    String resultloginDataTokenJson = "Bearer "+ resultloginDataJson.get("token");
+
+                    String createUserAdderssUrl = "http://h5.mall2.yingliao.tv/api/address/edit";
+                    String adderssPostData= "{\n" +
+                            "    \"real_name\": \""+phone+"\",\n" +
+                            "    \"phone\": \""+phone+"\",\n" +
+                            "    \"detail\": \"无\",\n" +
+                            "    \"id\": 0,\n" +
+                            "    \"address\": {\n" +
+                            "        \"province\": \"黑龙江省\",\n" +
+                            "        \"city\": \"鹤岗市\",\n" +
+                            "        \"district\": \"南山区\",\n" +
+                            "        \"city_id\": 151830\n" +
+                            "    },\n" +
+                            "    \"is_default\": 1\n" +
+                            "}";
+                    String resultcreateUserAdderss =HttpUtils.doHttpPost(createUserAdderssUrl,adderssPostData,"application/json",resultloginDataTokenJson);
+                    if(StringUtils.isEmpty(resultcreateUserAdderss)){
+                        return null;
+                    }
+                    log.info( "----------------返回值:"+resultcreateUserAdderss);
+                    JSONObject resultcreateUserAdderssJson  = JSONObject.parseObject(resultcreateUserAdderss);
+                    JSONObject resultcreateUserAdderssDataJson = (JSONObject) resultcreateUserAdderssJson.get("data");
+                    String addId = (String)resultcreateUserAdderssDataJson.get("id");
+                    SysTokenInfo tokenInfo = new SysTokenInfo();
                     tokenInfo.setUsername(phone);
                     tokenInfo.setPwd(pwd);
+                    tokenInfo.setUserAdderss(addId);
+                    tokenInfo.setCookie(resultDataTokenJson);
                     tokenInfo.setShopId(shop.getAppid());
                     tokenInfo.setCreateTime(new Date());
                     tokenInfo.setUpdateTime(new Date());
@@ -211,4 +248,8 @@ public class SysTokenInfoController extends BaseController
     {
         return toAjax(sysTokenInfoService.deleteSysTokenInfoByIds(ids));
     }
+
+
+
+
 }

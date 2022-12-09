@@ -5,15 +5,15 @@ import com.ruoyi.system.domain.SysTokenInfo;
 
 /**
  * TokenInfoMapper接口
- * 
+ *
  * @author ruoyi
  * @date 2022-12-08
  */
-public interface SysTokenInfoMapper 
+public interface SysTokenInfoMapper
 {
     /**
      * 查询TokenInfo
-     * 
+     *
      * @param id TokenInfo主键
      * @return TokenInfo
      */
@@ -21,7 +21,7 @@ public interface SysTokenInfoMapper
 
     /**
      * 查询TokenInfo列表
-     * 
+     *
      * @param sysTokenInfo TokenInfo
      * @return TokenInfo集合
      */
@@ -29,7 +29,7 @@ public interface SysTokenInfoMapper
 
     /**
      * 新增TokenInfo
-     * 
+     *
      * @param sysTokenInfo TokenInfo
      * @return 结果
      */
@@ -37,7 +37,7 @@ public interface SysTokenInfoMapper
 
     /**
      * 修改TokenInfo
-     * 
+     *
      * @param sysTokenInfo TokenInfo
      * @return 结果
      */
@@ -45,7 +45,7 @@ public interface SysTokenInfoMapper
 
     /**
      * 删除TokenInfo
-     * 
+     *
      * @param id TokenInfo主键
      * @return 结果
      */
@@ -53,9 +53,12 @@ public interface SysTokenInfoMapper
 
     /**
      * 批量删除TokenInfo
-     * 
+     *
      * @param ids 需要删除的数据主键集合
      * @return 结果
      */
     public int deleteSysTokenInfoByIds(String[] ids);
+
+
+    public SysTokenInfo selectTokenInfoOrderTopOne();
 }

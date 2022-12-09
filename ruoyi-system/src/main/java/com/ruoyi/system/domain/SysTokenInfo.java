@@ -7,7 +7,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * TokenInfo对象 sys_token_info
- * 
+ *
  * @author ruoyi
  * @date 2022-12-08
  */
@@ -42,9 +42,36 @@ public class SysTokenInfo extends BaseEntity
     @Excel(name = "描述")
     private String remarks;
 
+
+    /** 描述 */
+    @Excel(name = "用户地址")
+    private String userAdderss;
+
+    public String getUserAdderss() {
+        return userAdderss;
+    }
+
+    public void setUserAdderss(String userAdderss) {
+        this.userAdderss = userAdderss;
+    }
+
+    public Long getCountOrder() {
+        return countOrder;
+    }
+
+    public void setCountOrder(Long countOrder) {
+        this.countOrder = countOrder;
+    }
+
     /** pwd */
     @Excel(name = "pwd")
     private String pwd;
+
+    /** countOrder */
+    @Excel(name = "countOrder")
+    private Long countOrder;
+
+
 
     public void setId(Long id)
     {
@@ -132,6 +159,8 @@ public class SysTokenInfo extends BaseEntity
             .append("updateTime", getUpdateTime())
             .append("remarks", getRemarks())
             .append("pwd", getPwd())
+            .append("userAdderss", getUserAdderss())
+            .append("countOrder", getCountOrder())
             .toString();
     }
 }

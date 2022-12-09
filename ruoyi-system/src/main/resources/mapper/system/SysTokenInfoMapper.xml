@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysTokenInfoMapper">
-    
+
     <resultMap type="SysTokenInfo" id="SysTokenInfoResult">
         <result property="id"    column="id"    />
         <result property="shopId"    column="shopId"    />
@@ -14,16 +14,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="createTime"    />
         <result property="updateTime"    column="updateTime"    />
         <result property="remarks"    column="remarks"    />
+        <result property="countOrder"    column="countOrder"    />
         <result property="pwd"    column="pwd"    />
+        <result property="userAdderss"    column="userAdderss"    />
+
     </resultMap>
 
     <sql id="selectSysTokenInfoVo">
-        select id, shopId, username, queue, backup, cookie, createTime, updateTime, remarks, pwd from sys_token_info
+        select id, shopId, username, queue, backup, userAdderss,cookie, countOrder,createTime, updateTime, remarks, pwd from sys_token_info
     </sql>
 
     <select id="selectSysTokenInfoList" parameterType="SysTokenInfo" resultMap="SysTokenInfoResult">
         <include refid="selectSysTokenInfoVo"/>
-        <where>  
+        <where>
             <if test="shopId != null and shopId != ''"> and shopId = #{shopId}</if>
             <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
             <if test="queue != null "> and queue = #{queue}</if>
@@ -33,37 +36,50 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null "> and updateTime = #{updateTime}</if>
             <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
             <if test="pwd != null  and pwd != ''"> and pwd = #{pwd}</if>
+            <if test="countOrder != null "> and countOrder = #{countOrder}</if>
+            <if test="userAdderss != null  and userAdderss != ''"> and userAdderss = #{userAdderss}</if>
         </where>
     </select>
-    
+
     <select id="selectSysTokenInfoById" parameterType="Long" resultMap="SysTokenInfoResult">
         <include refid="selectSysTokenInfoVo"/>
         where id = #{id}
     </select>
-        
+
+
+    <select id="selectTokenInfoOrderTopOne"  resultMap="SysTokenInfoResult">
+        <include refid="selectSysTokenInfoVo"/>
+        order by countOrder asc LIMIT 0,1;
+    </select>
+
+
     <insert id="insertSysTokenInfo" parameterType="SysTokenInfo" useGeneratedKeys="true" keyProperty="id">
         insert into sys_token_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="shopId != null">shopId,</if>
             <if test="username != null">username,</if>
             <if test="queue != null">queue,</if>
+            <if test="countOrder != null">countOrder,</if>
             <if test="backup != null">backup,</if>
             <if test="cookie != null">cookie,</if>
             <if test="createTime != null">createTime,</if>
             <if test="updateTime != null">updateTime,</if>
             <if test="remarks != null">remarks,</if>
             <if test="pwd != null">pwd,</if>
+            <if test="userAdderss != null">userAdderss,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="shopId != null">#{shopId},</if>
             <if test="username != null">#{username},</if>
             <if test="queue != null">#{queue},</if>
+            <if test="countOrder != null">#{countOrder},</if>
             <if test="backup != null">#{backup},</if>
             <if test="cookie != null">#{cookie},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remarks != null">#{remarks},</if>
             <if test="pwd != null">#{pwd},</if>
+            <if test="userAdderss != null">#{userAdderss},</if>
          </trim>
     </insert>
 
@@ -73,12 +89,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="shopId != null">shopId = #{shopId},</if>
             <if test="username != null">username = #{username},</if>
             <if test="queue != null">queue = #{queue},</if>
+            <if test="countOrder != null">countOrder = #{countOrder},</if>
             <if test="backup != null">backup = #{backup},</if>
             <if test="cookie != null">cookie = #{cookie},</if>
             <if test="createTime != null">createTime = #{createTime},</if>
             <if test="updateTime != null">updateTime = #{updateTime},</if>
             <if test="remarks != null">remarks = #{remarks},</if>
             <if test="pwd != null">pwd = #{pwd},</if>
+            <if test="userAdderss != null">userAdderss = #{userAdderss},</if>
         </trim>
         where id = #{id}
     </update>
@@ -88,7 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteSysTokenInfoByIds" parameterType="String">
-        delete from sys_token_info where id in 
+        delete from sys_token_info where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

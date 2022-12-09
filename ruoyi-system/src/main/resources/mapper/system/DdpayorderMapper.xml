@@ -15,6 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="payUrl"    column="payUrl"    />
         <result property="method"    column="method"    />
         <result property="cookie"    column="cookie"    />
+        <result property="orderKey"    column="orderKey"    />
         <result property="body"    column="body"    />
         <result property="response"    column="response"    />
         <result property="result"    column="result"    />
@@ -34,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectDdpayorderVo">
-        select id, appid, name, orderId, phone, amount, orderUrl, payUrl, method, cookie, body, response, result, invalidTime, status, callbackUrl, callbackStatus, merchantOrderNo, completionTime, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayorder
+        select id, appid, name, orderId, orderKey,phone, amount, orderUrl, payUrl, method, cookie, body, response, result, invalidTime, status, callbackUrl, callbackStatus, merchantOrderNo, completionTime, deleted, createTime, updateTime, createBy, updateBy, createId, updateId from ddpayorder
     </sql>
 
     <select id="selectDdpayorderList" parameterType="Ddpayorder" resultMap="DdpayorderResult">
@@ -49,6 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="payUrl != null  and payUrl != ''"> and payUrl = #{payUrl}</if>
             <if test="method != null  and method != ''"> and method = #{method}</if>
             <if test="cookie != null  and cookie != ''"> and cookie = #{cookie}</if>
+            <if test="orderKey != null  and orderKey != ''"> and orderKey = #{orderKey}</if>
             <if test="body != null  and body != ''"> and body = #{body}</if>
             <if test="response != null  and response != ''"> and response = #{response}</if>
             <if test="result != null  and result != ''"> and result = #{result}</if>
@@ -88,6 +90,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null">orderId,</if>
             <if test="phone != null">phone,</if>
             <if test="amount != null">amount,</if>
+            <if test="orderKey != null">orderKey,</if>
             <if test="orderUrl != null">orderUrl,</if>
             <if test="payUrl != null">payUrl,</if>
             <if test="method != null">method,</if>
@@ -119,6 +122,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="payUrl != null">#{payUrl},</if>
             <if test="method != null">#{method},</if>
             <if test="cookie != null">#{cookie},</if>
+            <if test="orderKey != null">#{orderKey},</if>
             <if test="body != null">#{body},</if>
             <if test="response != null">#{response},</if>
             <if test="result != null">#{result},</if>
@@ -150,6 +154,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="payUrl != null">payUrl = #{payUrl},</if>
             <if test="method != null">method = #{method},</if>
             <if test="cookie != null">cookie = #{cookie},</if>
+            <if test="orderKey != null">orderKey = #{orderKey},</if>
             <if test="body != null">body = #{body},</if>
             <if test="response != null">response = #{response},</if>
             <if test="result != null">result = #{result},</if>

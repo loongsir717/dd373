@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
@@ -18,8 +19,10 @@ import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.security.Md5Utils;
 import com.ruoyi.system.controller.DuanxingApi;
 import com.ruoyi.system.domain.Ddpayshop;
+import com.ruoyi.system.domain.ShopGoods;
+import com.ruoyi.system.domain.SysTokenInfo;
 import com.ruoyi.system.mapper.DdpayshopMapper;
-import com.ruoyi.system.service.IDdpayshopService;
+import com.ruoyi.system.mapper.SysTokenInfoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,9 @@ public class DdpayorderServiceImpl implements IDdpayorderService
 
     @Autowired
     private DdpayshopMapper ddpayshopMapper;
+
+    @Autowired
+    private SysTokenInfoMapper sysTokenInfoMapper;
 
     @Value(value = "${ddconfig.appid}")
     private String appid;
@@ -340,7 +346,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                         order.setUpdateTime(new Date());
                         ddpayorderMapper.updateDdpayorder(order);
                     }
-                   //回调
+                    //回调
                     String result =  callbackUrl(order);
                     return result;
                 }
@@ -385,28 +391,148 @@ public class DdpayorderServiceImpl implements IDdpayorderService
 
     @Override
     public AjaxResult craeteOrderNo(Ddpayorder ddpayorder, String type) {
-         //1、登录   {"account":"18670055200","password":"123qwe"}
-         String loginUrl = "http://h5.mall2.yingliao.tv/api/login";
 
-        //String objJson = HttpUtils.sendGet(loginUrl, param, Constants.UTF8,cookie);
-
+        SysTokenInfo sysTokenInfo= sysTokenInfoMapper.selectTokenInfoOrderTopOne();
+        String cookie = sysTokenInfo.getCookie();
+        String adderssId = sysTokenInfo.getUserAdderss();
         //2、查询商品列表  URL  http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8  get
-        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8";
-        //3、获取商品详情  URL  http://h5.mall2.yingliao.tv/api/product/detail/{orderid} get
-        String queryGoodsdetailsUrl = "http://h5.mall2.yingliao.tv/api/product/detail/";
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=8",Constants.UTF8,cookie);
+        if(StringUtils.isEmpty(resultShopGoodsStr)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品列表失敗",null);
+        }
+        log.info( "----------------返回值:"+resultShopGoodsStr);
+        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+        String shopGoodslist = resultDataJson.getString("list");
+        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
+        String productId = "";
+        for (ShopGoods goods:shopGoods ) {
+            BigDecimal bd = new BigDecimal(goods.getPrice());
+            log.info( "-—---商品价格："+bd+";订单价格："+ddpayorder.getAmount());
+            if(bd.compareTo(ddpayorder.getAmount()) == 0 ){
+                productId = goods.getId();
+                break;
+            }
+        }
+        if(StringUtils.isEmpty(productId)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"没有价格为"+ddpayorder.getAmount()+"的商品",null);
+        }
+        //3、获取商品详情  URL  http://h5.mall2.yingliao.tv/api/product/detail/{productId} get
+        String queryGoodsdetailsUrl = "http://h5.mall2.yingliao.tv/api/product/detail/"+productId;
+        String resultProductInfoStr  = HttpUtils.sendGet(queryGoodsdetailsUrl,null,Constants.UTF8,cookie);
+        if(StringUtils.isEmpty(resultProductInfoStr)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品详情失敗",null);
+        }
+        log.info( "----获取商品详情---返回值:"+resultProductInfoStr);
+        JSONObject productInfoObj  = JSONObject.parseObject(resultProductInfoStr);
+        JSONObject resultProductInfoJson = (JSONObject) productInfoObj.get("data");
+        JSONArray productAttr = (JSONArray)  resultProductInfoJson.get("productAttr");
+        JSONObject attr_valuesObj = (JSONObject) productAttr.get(0);
+        JSONArray attr_values = (JSONArray)  attr_valuesObj.get("attr_values");
+        String arrt = "";
+        if(attr_values.size()>0){
+            arrt = (String) attr_values.get(0);
+        }else{
+            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+        }
+        if(StringUtils.isEmpty(arrt)){
+          return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+        }
+        JSONObject productValues = (JSONObject)  resultProductInfoJson.get("productValue");
+        JSONObject productValue = (JSONObject) productValues.get(arrt);
+        Integer product_id = productValue.getInteger("product_id");
+        log.info("获取商品详情  product_id:"+product_id);
+        String unique = (String)  productValue.get("unique");
+        log.info("获取商品详情  unique:"+unique);
+        if(product_id < 0 || StringUtils.isEmpty(unique)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",null);
+        }
         //4、加入购物车  URL   http://h5.mall2.yingliao.tv/api/cart/add post           {"productId":"4","cartNum":1,"new":1,"uniqueId":"1e734f6b","virtual_type":0}
         String addCartUrl = " http://h5.mall2.yingliao.tv/api/cart/add";
+        String addCarPostDate = "{\"productId\":\""+product_id+"\",\"cartNum\":1,\"new\":1,\"uniqueId\":\""+unique+"\"}";
+        String resultaddCarStr  = HttpUtils.doHttpPost(addCartUrl,addCarPostDate,"application/json",cookie);
+        if(StringUtils.isEmpty(resultaddCarStr)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品详情失敗",null);
+        }
+        log.info( "----加入购物车---返回值:"+resultaddCarStr);
+        JSONObject addCarObj  = JSONObject.parseObject(resultaddCarStr);
+        JSONObject addCarJson = (JSONObject) addCarObj.get("data");
+        String cartId = (String)  addCarJson.get("cartId");
+        log.info( "----加入购物车---Id:"+cartId);
+        if(StringUtils.isEmpty(cartId)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"加入购物车失敗",null);
+        }
+
         //5、确认订单信息  URL  http://h5.mall2.yingliao.tv/api/order/check_shipping  post   {"cartId":"4332171792833576960","new":1}
         String checkShippingUrl = "http://h5.mall2.yingliao.tv/api/order/check_shipping";
         //6、确认订单价格  URL   http://h5.mall2.yingliao.tv/api/coupons/order/0.01?cartId=4332171792833576960&new=1&shippingType=1  get
         String couponsOrderUrl = "http://h5.mall2.yingliao.tv/api/coupons/order/";
         //7、提交订单信息  URL   http://h5.mall2.yingliao.tv/api/order/confirm  post         {"cartId":"4332172211529973760","new":1,"addressId":0,"shipping_type":1}
         String confirmOrderUrl = "http://h5.mall2.yingliao.tv/api/order/confirm";
-        //8、创建订单  URL    http://h5.mall2.yingliao.tv/api/order/create/{购物车id}  post
-        // {"custom_form":[],"real_name":"咯嘛呢","phone":"18670055200","addressId":2,"formId":"","couponId":0,"payType":"alipay","useIntegral":false,"bargainId":0,"combinationId":0,"discountId":null,"pinkId":0,"advanceId":0,"seckill_id":0,"mark":"","from":"weixinh5","shipping_type":1,"new":1,"invoice_id":"","quitUrl":"http://h5.mall2.yingliao.tv/pages/goods/order_pay_status/index?&type=3&totalPrice=0.01"}
-        String createOrderUrl =  "http://h5.mall2.yingliao.tv/api/order/create/";
-        //9、验证订单orderkey  URL  http://h5.mall2.yingliao.tv/api/order/computed/{购物车id}  post   {"addressId":2,"useIntegral":0,"couponId":0,"shipping_type":1,"payType":"weixin"}
-        String orderkeyUrl = "http://h5.mall2.yingliao.tv/api/order/computed";
+        String confirmOrderPostDate = "{\"cartId\":\""+cartId+"\"," +
+                "\"new\":1," +
+                "\"addressId\":"+sysTokenInfo.getUserAdderss()+"," +
+                "\"shipping_type\":1}";
+        String resultConfirmOrderStr  = HttpUtils.doHttpPost(confirmOrderUrl,confirmOrderPostDate,"application/json",cookie);
+        if(StringUtils.isEmpty(resultConfirmOrderStr)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"提交订单失败",null);
+        }
+        log.info( "----提交订单---返回值:"+resultConfirmOrderStr);
+        JSONObject confirmOrderObj  = JSONObject.parseObject(resultConfirmOrderStr);
+        JSONObject confirmOrderData = (JSONObject) confirmOrderObj.get("data");
+        String orderKey = (String) confirmOrderData.get("orderKey");
+
+        //8、验证订单orderkey  URL  http://h5.mall2.yingliao.tv/api/order/computed/{购物车id}  post   {"addressId":2,"useIntegral":0,"couponId":0,"shipping_type":1,"payType":"alipay"}
+        String orderkeyUrl = "http://h5.mall2.yingliao.tv/api/order/computed/"+orderKey;
+        String orderkeyPostDate = "{\"addressId\":"+adderssId+",\"useIntegral\":0,\"couponId\":0,\"shipping_type\":1,\"payType\":\"alipay\"}";
+        String resultorderkeyStr  = HttpUtils.doHttpPost(orderkeyUrl,orderkeyPostDate,"application/json",cookie);
+        if(StringUtils.isEmpty(resultorderkeyStr)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"提交订单失败",null);
+        }
+        log.info( "----提交订单---返回值:"+resultorderkeyStr);
+        JSONObject orderkeyObj  = JSONObject.parseObject(resultorderkeyStr);
+        Integer status = orderkeyObj.getInteger("status");
+        if(200 != status){
+            return new AjaxResult(AjaxResult.Type.ERROR,"创建订单失败",null);
+        }
+
+
+        //9、创建订单  URL    http://h5.mall2.yingliao.tv/api/order/create/{orderkey}  post
+        //
+        String createOrderUrl =  "http://h5.mall2.yingliao.tv/api/order/create/"+orderKey;
+        String createOrderPostDate = "{\"custom_form\":[]," +
+                "\"real_name\":\""+sysTokenInfo.getUsername()+"\"," +
+                "\"phone\":\""+sysTokenInfo.getUsername()+"\"," +
+                "\"addressId\":"+sysTokenInfo.getUserAdderss()+"," +
+                "\"formId\":\"\",\"couponId\":0," +
+                "\"payType\":\"alipay\"," +
+                "\"useIntegral\":false,\"bargainId\":0,\"combinationId\":0,\"discountId\":null,\"pinkId\":0,\"advanceId\":0,\"seckill_id\":0,\"mark\":\"\",\"from\":\"weixinh5\",\"shipping_type\":1,\"new\":1,\"invoice_id\":\"\"," +
+                "\"quitUrl\":\"http://h5.mall2.yingliao.tv/pages/goods/order_pay_status/index?&type=3&totalPrice=0.01\"}";
+        String resultcreateOrderPostDateStr  = HttpUtils.doHttpPost(createOrderUrl,createOrderPostDate,"application/json",cookie);
+        if(StringUtils.isEmpty(resultcreateOrderPostDateStr)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"提交订单失败",null);
+        }
+        log.info( "----创建订单---返回值:"+resultcreateOrderPostDateStr);
+
+        JSONObject createOrderObj  = JSONObject.parseObject(resultcreateOrderPostDateStr);
+        status = createOrderObj.getInteger("status");
+        if(200 != status){
+            return new AjaxResult(AjaxResult.Type.ERROR,"创建订单失败",null);
+        }
+        JSONObject createOrderData = (JSONObject) createOrderObj.get("data");
+        JSONObject resultData = (JSONObject) createOrderData.get("result");
+
+        String jsConfig = (String) resultData.get("jsConfig");
+        String key = (String) resultData.get("key");
+        String orderId = (String) resultData.get("orderId");
+        String statusData = (String) createOrderData.get("status");
+
+        ddpayorder.setOrderId(orderId);  //订单号
+        ddpayorder.setMethod(statusData); //支付方式
+        ddpayorder.setOrderKey(key);    //orderkey
+        ddpayorder.setResult(jsConfig);//返回结果
+
         //10、订单支付接口  URL  http://h5.mall.yingliao.tv/api/order/pay  post
            /* {
                 "uni": "cp330027658781917184",
@@ -417,6 +543,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             }*/
         String orderPayUrl = "http://h5.mall.yingliao.tv/api/order/pay";
 
-        return null;
+        return new AjaxResult(AjaxResult.Type.SUCCESS,"成功",jsConfig);
     }
+
 }
