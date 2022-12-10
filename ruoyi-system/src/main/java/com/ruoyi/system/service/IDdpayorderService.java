@@ -92,4 +92,10 @@ public interface IDdpayorderService
 
     public List<Ddpayorder> selectPayorderStatusList(Ddpayorder ddpayorder);
 
+
+    /**
+     * 更新订单状态
+     */
+    public Ddpayorder updateOrderPayStatus(Ddpayorder ddpayorder);
+
 }

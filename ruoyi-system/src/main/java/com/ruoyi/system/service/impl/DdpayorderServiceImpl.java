@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -23,6 +24,19 @@ import com.ruoyi.system.domain.ShopGoods;
 import com.ruoyi.system.domain.SysTokenInfo;
 import com.ruoyi.system.mapper.DdpayshopMapper;
 import com.ruoyi.system.mapper.SysTokenInfoMapper;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.*;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -306,56 +320,14 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     @Override
     public String callbackOrder(Ddpayorder order) {
             if(order.getStatus() < 1 ){  //如果订单状态为0 则需要请求dd373
-                String appid = order.getAppid();
-                Ddpayshop   ddpayshop  =   ddpayshopMapper.selectDdpayshopByAppId(appid);
-                if(ddpayshop == null){
-                   return "未找到店铺信息";
-                }
-                String orderNo =  order.getOrderId();
-                String  param= "?StartDate=&EndDate=&Keyword="+orderNo+"&Classify=2&Type=0&PageSize=20&PageIndex=1";
-                String objJson = "";
-                try{
-                    objJson = HttpUtils.sendGet(queryOrder, param, Constants.UTF8,ddpayshop.getCookie());
-                }catch (Exception e){
-
-                }
-                if(StringUtils.isEmpty(objJson)){
-                    return "请求失败";
-                }
-                JSONObject jsonObject  = JSONObject.parseObject(objJson);
-                JSONObject statusData = (JSONObject) jsonObject.get("StatusData");
-                String resultCode  = (String) statusData.get("ResultCode");
-                if(!"0".equals(resultCode)){
-                    return "查询失败";
-                }
-                JSONObject resultData= (JSONObject) statusData.get("ResultData");
-                JSONArray pageResult = (JSONArray) resultData.get("PageResult");
-                if(pageResult.size()>0){
-                    JSONObject ob = (JSONObject) pageResult.get(0);//得到json对象
-                    String state =(String)  ob.get("State");//订单状态
-                    String createDate = (String)  ob.get("CreateDate");//订单日期
-                    String orderId = (String) ob.get("OrderId");// 订单号
-                    if(StringUtils.isNotEmpty(state) && "成功".equals(state)){
-                        order.setStatus(1L);
-                        try{
-                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            order.setCompletionTime(df.parse(createDate));
-                        }catch (Exception e){
-
-                        }
-                        order.setUpdateTime(new Date());
-                        ddpayorderMapper.updateDdpayorder(order);
-                    }
-                    //回调
-                    String result =  callbackUrl(order);
-                    return result;
-                }
+                order = updateOrderPayStatus(order);
+                String result =  callbackUrl(order);
+                return result;
             }else{
                 //如果已查询成功、但回调失败，需要重新回调！
                 String result =  callbackUrl(order);
                 return result;
             }
-        return null;
     }
 
     private String callbackUrl(Ddpayorder ddpayorder){
@@ -363,7 +335,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         log.info("加密前未加token的串： "+parm);
         String sign = Md5Utils.hash(parm+token).toUpperCase();
         log.info("加token后的加密后的串： "+sign);
-        String postData = "{\"appId\":\""+appid+"\"," +
+        String postData = "{\"appid\":\""+appid+"\"," +
                 "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
                 "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
                 "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
@@ -428,6 +400,9 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         JSONObject productInfoObj  = JSONObject.parseObject(resultProductInfoStr);
         JSONObject resultProductInfoJson = (JSONObject) productInfoObj.get("data");
         JSONArray productAttr = (JSONArray)  resultProductInfoJson.get("productAttr");
+        if(productAttr == null || productAttr.size()<=0){
+            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+        }
         JSONObject attr_valuesObj = (JSONObject) productAttr.get(0);
         JSONArray attr_values = (JSONArray)  attr_valuesObj.get("attr_values");
         String arrt = "";
@@ -440,7 +415,14 @@ public class DdpayorderServiceImpl implements IDdpayorderService
           return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
         }
         JSONObject productValues = (JSONObject)  resultProductInfoJson.get("productValue");
-        JSONObject productValue = (JSONObject) productValues.get(arrt);
+        Set<String> keys = productValues.keySet();
+        JSONObject productValue = null;
+        for(String t:keys){
+            productValue = (JSONObject) productValues.get(t);
+        }
+        if(productValue == null ){
+            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失败",null);
+        }
         Integer product_id = productValue.getInteger("product_id");
         log.info("获取商品详情  product_id:"+product_id);
         String unique = (String)  productValue.get("unique");
@@ -529,6 +511,19 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String orderId = (String) resultData.get("orderId");
         String statusData = (String) createOrderData.get("status");
 
+        Document document = Jsoup.parse(jsConfig);
+        Elements eForm = document.getElementsByTag("form");
+        Elements eInput = document.getElementsByTag("input");
+        Map<String,String> map = new HashMap<String,String>();
+        Attributes attrs = null;
+        for(int i=0;i<eInput.size();i++){
+            attrs = eInput.get(i).attributes();
+            map.put(attrs.get("name"),attrs.get("value"));
+        }
+        String alipayUrl = eForm.attr("action");
+        map.put("action",alipayUrl);
+
+        String payUrl = sendRequest(map) ;
         ddpayorder.setOrderId(orderId);  //订单号
         ddpayorder.setMethod(statusData); //支付方式
         ddpayorder.setOrderKey(key);    //orderkey
@@ -539,22 +534,85 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         ddpayorder.setAppid(sysTokenInfo.getShopId());
         ddpayorder.setName(sysTokenInfo.getUsername());
         ddpayorder.setPhone(sysTokenInfo.getUsername());
-        ddpayorderMapper.insertDdpayorder(ddpayorder);
-
-
-
-
-        //10、订单支付接口  URL  http://h5.mall.yingliao.tv/api/order/pay  post
-           /* {
-                "uni": "cp330027658781917184",
-                    "paytype": "alipay",
-                    "type": 0,
-                    "from": "weixinh5",
-                    "quitUrl": "http://h5.mall.yingliao.tv/pages/goods/order_details/index?order_id=cp330027658781917184"
-            }*/
-        String orderPayUrl = "http://h5.mall.yingliao.tv/api/order/pay";
-
-        return new AjaxResult(AjaxResult.Type.SUCCESS,"成功","http://localhost:8088/outside/order/payOrder/"+ddpayorder.getOrderId()+"_"+ddpayorder.getMerchantOrderNo()+"_"+ddpayorder.getAmount());
+        ddpayorder.setPayUrl(payUrl);
+        int count = ddpayorderMapper.insertDdpayorder(ddpayorder);
+        if(count>0&&StringUtils.isNotEmpty(payUrl)){
+            Map<String,String > resMap = new HashMap();
+            resMap.put("orderPayLink",payUrl);
+            resMap.put("orderNo",orderId);
+            resMap.put("merchantOrderNo",ddpayorder.getMerchantOrderNo());
+            return new AjaxResult(AjaxResult.Type.SUCCESS,null, JSONObject.toJSON(resMap));
+        }
+        return new AjaxResult(AjaxResult.Type.SUCCESS,"成功",payUrl);
     }
 
+    public  String sendRequest(Map<String,String> map){
+        HttpResponse response = null;
+        try {
+            // 创建HttpClient实例及Post方法
+            CloseableHttpClient httpclient = new DefaultHttpClient();
+            String url =map.get("action");
+            String respContent = "";
+            HttpPost httppost = new HttpPost(url);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            //因为传入的值为汉字，所以使用ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8)进行一个字符的转换，否则将会出现乱码。字母和数字不需要使用。
+            builder.addTextBody("method", map.get("method"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("app_id", map.get("app_id"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("timestamp", map.get("timestamp"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("format", map.get("format"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("version", map.get("version") ,ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("alipay_sdk", map.get("alipay_sdk"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("charset", map.get("charset"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("sign_type", map.get("sign_type"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("biz_content", map.get("biz_content"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("notify_url", map.get("notify_url"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            builder.addTextBody("sign", map.get("sign"), ContentType.create(HTTP.PLAIN_TEXT_TYPE,HTTP.UTF_8));
+            HttpEntity multipart = builder.build();
+            httppost.setEntity(multipart);
+            response =httpclient.execute(httppost);// 发送请求
+            System.out.println(response.getStatusLine().getStatusCode());
+
+            //注意，返回的结果的状态码是302，非200
+            if (response.getStatusLine().getStatusCode() == 302) {
+                HttpEntity he = response.getEntity();
+                System.out.println(response.getHeaders("Location"));
+                respContent = EntityUtils.toString(he, "UTF-8");
+                String line="";
+                StringBuilder result = new StringBuilder();
+                int count = response.getAllHeaders().length;
+                for (int i=0;i<count;i++) {
+                    if("Location".equals(response.getAllHeaders()[i].getName()) ){
+                        String str =response.getAllHeaders()[i].getValue();
+                        return str;
+                    }
+                }
+            }
+            httppost.releaseConnection();
+            httpclient.getConnectionManager().shutdown();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Ddpayorder updateOrderPayStatus(Ddpayorder ddpayorder) {
+        String url = "http://h5.mall2.yingliao.tv/api/order/detail/";//cp332958393926942720
+        String resultShopGoodsStr  = HttpUtils.sendGet(url,"订单号",Constants.UTF8,ddpayorder.getCookie());
+        if(StringUtils.isEmpty(resultShopGoodsStr)){
+            return null;
+        }
+        log.info( "----------------返回值:"+resultShopGoodsStr);
+        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+        Integer integer =  resultDataJson.getInteger("paid");
+        int count =0;
+        if(integer==1){
+            ddpayorder.setStatus(1L);
+            count = ddpayorderMapper.updateDdpayorder(ddpayorder);
+        }
+        return ddpayorder;
+    }
 }

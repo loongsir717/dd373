@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -200,6 +201,7 @@ public class HttpUtils
             }
             conn.setDoOutput(true);
             conn.setDoInput(true);
+            Map headers = conn.getHeaderFields();
             out = new PrintWriter(conn.getOutputStream());
             out.print(param);
             out.flush();

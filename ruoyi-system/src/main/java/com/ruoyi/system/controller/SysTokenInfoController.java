@@ -249,7 +249,4 @@ public class SysTokenInfoController extends BaseController
         return toAjax(sysTokenInfoService.deleteSysTokenInfoByIds(ids));
     }
 
-
-
-
 }

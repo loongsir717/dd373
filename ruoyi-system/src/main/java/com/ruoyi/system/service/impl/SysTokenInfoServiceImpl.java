@@ -119,7 +119,7 @@ public class SysTokenInfoServiceImpl implements ISysTokenInfoService
             if(StringUtils.isEmpty(objJson)){
                 return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
             }
-            log.info( "----------------返回值:"+objJson);
+            log.info( "----------------登錄返回值:"+objJson);
             JSONObject resultJson  = JSONObject.parseObject(objJson);
             JSONObject resultDataJson = (JSONObject) resultJson.get("data");
             String cookie = "Bearer "+ resultDataJson.get("token");
@@ -142,4 +142,6 @@ public class SysTokenInfoServiceImpl implements ISysTokenInfoService
     public SysTokenInfo selectTokenInfoOrderTopOne() {
         return sysTokenInfoMapper.selectTokenInfoOrderTopOne();
     }
+
+
 }

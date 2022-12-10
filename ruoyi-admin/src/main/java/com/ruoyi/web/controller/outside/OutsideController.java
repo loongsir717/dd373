@@ -76,17 +76,17 @@ public class OutsideController extends BaseController {
     @PostMapping("/createOrder")
     @ResponseBody
     public AjaxResult createOrder(Ddpayorder ddpayorder){
-//        String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbackUrl()+
-//                ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
-//        logger.info("afterSign:"+afterSign);
-//        String sign = Md5Utils.hash(afterSign).toUpperCase();
-//        logger.info("sign:"+sign);
-//        if(!sign.equals(ddpayorder.getSign())){
-//            return new AjaxResult(AjaxResult.Type.ERROR,"验签失败！","");
-//        }else{
-//            return ddpayorderService.craeteOrderNo(ddpayorder,"Shop");
-//        }
-        return ddpayorderService.craeteOrderNo(ddpayorder,"Shop");
+        String afterSign = appid+ddpayorder.getMerchantOrderNo()+ddpayorder.getCallbackUrl()+
+                ddpayorder.getAmount()+ddpayorder.getTimestamps()+token;
+        logger.info("afterSign:"+afterSign);
+        String sign = Md5Utils.hash(afterSign).toUpperCase();
+        logger.info("sign:"+sign);
+        if(!sign.equals(ddpayorder.getSign())){
+            return new AjaxResult(AjaxResult.Type.ERROR,"验签失败！","");
+        }else{
+            return ddpayorderService.craeteOrderNo(ddpayorder,"Shop");
+        }
+      //  return ddpayorderService.craeteOrderNo(ddpayorder,"Shop");
     }
 
     @PostMapping("/queryShopOrder")

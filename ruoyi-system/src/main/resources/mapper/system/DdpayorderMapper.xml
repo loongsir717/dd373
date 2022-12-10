@@ -118,11 +118,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null">#{orderId},</if>
             <if test="phone != null">#{phone},</if>
             <if test="amount != null">#{amount},</if>
+            <if test="orderKey != null">#{orderKey},</if>
             <if test="orderUrl != null">#{orderUrl},</if>
             <if test="payUrl != null">#{payUrl},</if>
             <if test="method != null">#{method},</if>
             <if test="cookie != null">#{cookie},</if>
-            <if test="orderKey != null">#{orderKey},</if>
             <if test="body != null">#{body},</if>
             <if test="response != null">#{response},</if>
             <if test="result != null">#{result},</if>
