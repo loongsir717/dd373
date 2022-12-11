@@ -610,8 +610,9 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         sysTokenInfo.setUsername(ddpayorder.getPhone());
         List<SysTokenInfo> sysTokenInfos= sysTokenInfoMapper.selectSysTokenInfoList(sysTokenInfo);
         if(sysTokenInfos !=null||sysTokenInfos.size()>0){
+            sysTokenInfo = sysTokenInfos.get(0);
             String loginUrl = "http://h5.mall2.yingliao.tv/api/login";
-            String postDate = " {\"account\":\""+ddpayorder.getPhone()+"\",\"password\":\""+sysTokenInfos.get(0).getPwd()+"\"}";
+            String postDate = " {\"account\":\""+ddpayorder.getPhone()+"\",\"password\":\""+sysTokenInfo.getPwd()+"\"}";
             String loginJson = HttpUtils.doHttpPost(loginUrl,postDate,"application/json",null);
             if(StringUtils.isEmpty(loginJson)){
                 return null;
@@ -636,8 +637,12 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                     ddpayorder.setStatus(1L);
                     ddpayorder.setCompletionTime(new Date());
                     count = ddpayorderMapper.updateDdpayorder(ddpayorder);
+                    Long countOrder = sysTokenInfo.getCountOrder();
+                    sysTokenInfo.setCountOrder(countOrder++);
+                    sysTokenInfoMapper.updateSysTokenInfo(sysTokenInfo);
                 }
             }
+            return ddpayorder;
         }
         return ddpayorder;
     }
