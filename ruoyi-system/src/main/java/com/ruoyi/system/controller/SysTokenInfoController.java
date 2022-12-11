@@ -16,6 +16,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +47,9 @@ public class SysTokenInfoController extends BaseController
 
     @Autowired
     private ISysTokenInfoService sysTokenInfoService;
+
+    @Value(value = "${ddconfig.phonePd}")
+    private String pwd;
 
     @Autowired
     private IDdpayshopService iDdpayshopService;
@@ -132,7 +136,6 @@ public class SysTokenInfoController extends BaseController
             for(int i=0;i<10;i++){
                 StringUtils.getIdNo(true);
                 String phone = StringUtils.getPhoneNum();
-                String pwd = "123qwe";
                 String createPostData = "{" +
                         "    \"uid\": 0," +
                         "    \"real_name\": \"1\"," +
