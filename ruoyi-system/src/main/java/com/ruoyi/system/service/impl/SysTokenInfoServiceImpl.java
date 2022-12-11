@@ -110,12 +110,12 @@ public class SysTokenInfoServiceImpl implements ISysTokenInfoService
     public AjaxResult updateTokeninfo() {
         //查询账号
         List<SysTokenInfo> sysTokenInfos = sysTokenInfoMapper.selectSysTokenInfoList(new SysTokenInfo());
-        String tokenUrl = "http://h5.mall2.yingliao.tv/api/login";
+        String loginUrl = "http://h5.mall2.yingliao.tv/api/login";
         int count = 0;
         for(SysTokenInfo sysTokenInfo:sysTokenInfos){
             //登录账号
-            String tokenPostdata = "{\"account\":\""+sysTokenInfo.getUsername()+"\",\"pwd\":\""+sysTokenInfo.getPwd()+"\"}";
-            String objJson = HttpUtils.doHttpPost(tokenUrl,tokenPostdata,"application/json",null);
+            String postDate = " {\"account\":\""+sysTokenInfo.getUsername()+"\",\"password\":\""+sysTokenInfo.getPwd()+"\"}";
+            String objJson = HttpUtils.doHttpPost(loginUrl,postDate,"application/json",null);
             if(StringUtils.isEmpty(objJson)){
                 return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
             }

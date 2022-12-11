@@ -321,8 +321,12 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     public String callbackOrder(Ddpayorder order) {
             if(order.getStatus() < 1 ){  //如果订单状态为0 则需要请求dd373
                 order = updateOrderPayStatus(order);
-                String result =  callbackUrl(order);
-                return result;
+                if(order.getStatus()==1){
+                    String result =  callbackUrl(order);
+                    return result;
+                }else{
+                    return "";
+                }
             }else{
                 //如果已查询成功、但回调失败，需要重新回调！
                 String result =  callbackUrl(order);
@@ -533,6 +537,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         ddpayorder.setUpdateTime(new Date());
         ddpayorder.setAppid(sysTokenInfo.getShopId());
         ddpayorder.setName(sysTokenInfo.getUsername());
+        ddpayorder.setCallbackStatus(0);
         ddpayorder.setPhone(sysTokenInfo.getUsername());
         ddpayorder.setPayUrl(payUrl);
         int count = ddpayorderMapper.insertDdpayorder(ddpayorder);
@@ -600,17 +605,18 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     @Override
     public Ddpayorder updateOrderPayStatus(Ddpayorder ddpayorder) {
         String url = "http://h5.mall2.yingliao.tv/api/order/detail/";//cp332958393926942720
-        String resultShopGoodsStr  = HttpUtils.sendGet(url,"订单号",Constants.UTF8,ddpayorder.getCookie());
+        String resultShopGoodsStr  = HttpUtils.sendGet(url+ddpayorder.getOrderId(),StringUtils.EMPTY,Constants.UTF8,ddpayorder.getCookie());
         if(StringUtils.isEmpty(resultShopGoodsStr)){
             return null;
         }
-        log.info( "----------------返回值:"+resultShopGoodsStr);
+        log.info( "------查询订单支付状态------返回值:"+resultShopGoodsStr);
         JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
         JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
         Integer integer =  resultDataJson.getInteger("paid");
         int count =0;
         if(integer==1){
             ddpayorder.setStatus(1L);
+            ddpayorder.setCompletionTime(new Date());
             count = ddpayorderMapper.updateDdpayorder(ddpayorder);
         }
         return ddpayorder;

@@ -104,8 +104,8 @@
                     title: '金额'
                 },
                 {
-                    field: 'orderUrl',
-                    title: '下单地址',
+                    field: 'payUrl',
+                    title: '支付地址',
                     formatter: function(value, row, index) {
                         return $.table.tooltip(value);
                     }
@@ -124,7 +124,10 @@
                 // },
                 {
                     field: 'body',
-                    title: 'body'
+                    title: 'body',
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value);
+                    }
                 },
                 // {
                 //     field: 'response',

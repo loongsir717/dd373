@@ -127,6 +127,9 @@ public class HttpUtils
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("cookie", cookie);
             connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            if(StringUtils.isNotEmpty(cookie)){
+                connection.setRequestProperty("Authori-zation", cookie);
+            }
             connection.connect();
             in = new BufferedReader(new InputStreamReader(connection.getInputStream(), contentType));
             String line;
