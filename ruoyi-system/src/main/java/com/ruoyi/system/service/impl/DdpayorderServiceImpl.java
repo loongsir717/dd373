@@ -335,33 +335,34 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     }
 
     private String callbackUrl(Ddpayorder ddpayorder){
-        String parm = appid+ddpayorder.getOrderId()+ddpayorder.getMerchantOrderNo()+ddpayorder.getStatus()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
-        log.info("加密前未加token的串： "+parm);
-        String sign = Md5Utils.hash(parm+token).toUpperCase();
-        log.info("加token后的加密后的串： "+sign);
-        String postData = "{\"appid\":\""+appid+"\"," +
-                "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
-                "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
-                "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
-                "\"amount\":\""+ddpayorder.getAmount()+"\"," +
-                "\"payTime\":\""+ddpayorder.getCompletionTime().getTime()+"\"," +
-                "\"sign\":\""+sign+"\"}";
-        log.info("回调参数： "+postData);
-        log.info("回调地址： "+ddpayorder.getCallbackUrl());
-        String callbackJson = "";
         try{
+            String parm = appid+ddpayorder.getOrderId()+ddpayorder.getMerchantOrderNo()+ddpayorder.getStatus()+ ddpayorder.getAmount()+ddpayorder.getCompletionTime().getTime();
+            log.info("加密前未加token的串： "+parm);
+            String sign = Md5Utils.hash(parm+token).toUpperCase();
+            log.info("加token后的加密后的串： "+sign);
+            String postData = "{\"appid\":\""+appid+"\"," +
+                    "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
+                    "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
+                    "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
+                    "\"amount\":\""+ddpayorder.getAmount()+"\"," +
+                    "\"payTime\":\""+ddpayorder.getCompletionTime().getTime()+"\"," +
+                    "\"sign\":\""+sign+"\"}";
+            log.info("回调参数： "+postData);
+            log.info("回调地址： "+ddpayorder.getCallbackUrl());
+            String callbackJson = "";
            callbackJson  =  HttpUtils.doHttpPost(ddpayorder.getCallbackUrl(),postData,"application/json",null);
-        }catch (Exception e){
-
-        }
-        if("success".equals(callbackJson)){
-            ddpayorder.setCallbackStatus(1);
-            int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
-            if(count>0){
-                log.info("回调订单号："+ddpayorder.getOrderId()+"，成功");
+            if("success".equals(callbackJson)){
+                ddpayorder.setCallbackStatus(1);
+                int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
+                if(count>0){
+                    log.info("回调订单号："+ddpayorder.getOrderId()+"，成功");
+                }
             }
+            return callbackJson;
+        }catch (Exception e){
+            log.info(e.getMessage());
         }
-        return callbackJson;
+        return "";
     }
 
 
@@ -537,6 +538,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         ddpayorder.setUpdateTime(new Date());
         ddpayorder.setAppid(sysTokenInfo.getShopId());
         ddpayorder.setName(sysTokenInfo.getUsername());
+        ddpayorder.setCookie(cookie);
         ddpayorder.setCallbackStatus(0);
         ddpayorder.setPhone(sysTokenInfo.getUsername());
         ddpayorder.setPayUrl(payUrl);
@@ -604,20 +606,38 @@ public class DdpayorderServiceImpl implements IDdpayorderService
 
     @Override
     public Ddpayorder updateOrderPayStatus(Ddpayorder ddpayorder) {
-        String url = "http://h5.mall2.yingliao.tv/api/order/detail/";//cp332958393926942720
-        String resultShopGoodsStr  = HttpUtils.sendGet(url+ddpayorder.getOrderId(),StringUtils.EMPTY,Constants.UTF8,ddpayorder.getCookie());
-        if(StringUtils.isEmpty(resultShopGoodsStr)){
-            return null;
-        }
-        log.info( "------查询订单支付状态------返回值:"+resultShopGoodsStr);
-        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
-        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
-        Integer integer =  resultDataJson.getInteger("paid");
-        int count =0;
-        if(integer==1){
-            ddpayorder.setStatus(1L);
-            ddpayorder.setCompletionTime(new Date());
-            count = ddpayorderMapper.updateDdpayorder(ddpayorder);
+        SysTokenInfo sysTokenInfo = new SysTokenInfo();
+        sysTokenInfo.setUsername(ddpayorder.getPhone());
+        List<SysTokenInfo> sysTokenInfos= sysTokenInfoMapper.selectSysTokenInfoList(sysTokenInfo);
+        if(sysTokenInfos !=null||sysTokenInfos.size()>0){
+            String loginUrl = "http://h5.mall2.yingliao.tv/api/login";
+            String postDate = " {\"account\":\""+ddpayorder.getPhone()+"\",\"password\":\""+sysTokenInfos.get(0).getPwd()+"\"}";
+            String loginJson = HttpUtils.doHttpPost(loginUrl,postDate,"application/json",null);
+            if(StringUtils.isEmpty(loginJson)){
+                return null;
+            }
+            log.info( "----------------返回值:"+loginJson);
+            JSONObject resultloginson  = JSONObject.parseObject(loginJson);
+            JSONObject resultloginDataJson = (JSONObject) resultloginson.get("data");
+            String tokenJson = "Bearer "+ resultloginDataJson.get("token");
+            String url = "http://h5.mall2.yingliao.tv/api/order/detail/";//cp332958393926942720
+            String resultShopGoodsStr  = HttpUtils.sendGet(url+ddpayorder.getOrderId(),StringUtils.EMPTY,Constants.UTF8,tokenJson);
+            if(StringUtils.isEmpty(resultShopGoodsStr)){
+                return null;
+            }
+            log.info( "------查询订单支付状态------返回值:"+resultShopGoodsStr);
+            JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+            Integer status =  shopGoodsJSONObject.getInteger("status");
+            if(200==status){
+                JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+                Integer integer =  resultDataJson.getInteger("paid");
+                int count =0;
+                if(integer==1){
+                    ddpayorder.setStatus(1L);
+                    ddpayorder.setCompletionTime(new Date());
+                    count = ddpayorderMapper.updateDdpayorder(ddpayorder);
+                }
+            }
         }
         return ddpayorder;
     }
