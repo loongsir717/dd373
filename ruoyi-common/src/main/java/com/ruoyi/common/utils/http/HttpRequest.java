@@ -305,9 +305,7 @@ public class HttpRequest {
     //测试发送GET和POST请求
     public static void main(String[] args) throws Exception {
 
-        //test1();
-        sendRequest();
-       // createUserCre("1");
+
     }
 
     public static void test1(){

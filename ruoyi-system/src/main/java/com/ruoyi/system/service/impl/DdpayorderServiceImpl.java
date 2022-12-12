@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -350,7 +351,16 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             log.info("回调参数： "+postData);
             log.info("回调地址： "+ddpayorder.getCallbackUrl());
             String callbackJson = "";
-           callbackJson  =  HttpUtils.doHttpPost(ddpayorder.getCallbackUrl(),postData,"application/json",null);
+
+            HashMap<String, Object> paramMap = new HashMap<>();
+            paramMap.put("appid", appid);
+            paramMap.put("orderNo", ddpayorder.getOrderId());
+            paramMap.put("merchantOrderNo", ddpayorder.getMerchantOrderNo());
+            paramMap.put("payStatus", ddpayorder.getStatus()+"");
+            paramMap.put("amount", ddpayorder.getAmount()+"");
+            paramMap.put("payTime", ddpayorder.getCompletionTime().getTime()+"");
+            paramMap.put("sign", sign);
+            callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
             if("success".equals(callbackJson)){
                 ddpayorder.setCallbackStatus(1);
                 int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
