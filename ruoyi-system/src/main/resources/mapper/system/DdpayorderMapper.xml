@@ -61,7 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="merchantOrderNo != null  and merchantOrderNo != ''"> and merchantOrderNo = #{merchantOrderNo}</if>
             <if test="completionTime != null "> and completionTime = #{completionTime}</if>
             <if test="deleted != null "> and deleted = #{deleted}</if>
-            <if test="createTime != null "> and createTime = #{createTime}</if>
+            <if test="createTime != null "> and DATE_FORMAT(createTime,'%Y%m%d') = DATE_FORMAT(#{createTime},'%Y%m%d')</if>
             <if test="updateTime != null "> and updateTime = #{updateTime}</if>
             <if test="createBy != null  and createBy != ''"> and createBy = #{createBy}</if>
             <if test="updateBy != null  and updateBy != ''"> and updateBy = #{updateBy}</if>

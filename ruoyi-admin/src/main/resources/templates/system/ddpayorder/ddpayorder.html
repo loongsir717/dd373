@@ -30,7 +30,10 @@
                                 <label>回调单号：</label>
                                 <input type="text" name="merchantOrderNo"/>
                             </li>
-
+                            <li>
+                                <label>创建时间：</label>
+                                <input type="date" name="createTime"/>
+                            </li>
                             <li>
                                 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
                                 <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -59,7 +62,8 @@
             </div>
         </div>
     </div>
-    <th:block th:include="include :: footer" />
+     <div th:include="include :: footer"></div>
+<!--    <th:block th:include="include :: footer" />-->
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('system:ddpayorder:edit')}]];
         var removeFlag = [[${@permission.hasPermi('system:ddpayorder:remove')}]];
@@ -77,7 +81,9 @@
                 removeUrl: prefix + "/remove",
                 callbackUrl: prefix + "/callback",
                 exportUrl: prefix + "/export",
-                modalName: "多多373订单",
+                modalName: "订单",
+                showFooter: true,
+                footerStyle: footerStyle,
                 columns: [{
                     checkbox: true
                 },
@@ -101,7 +107,14 @@
 
                 {
                     field: 'amount',
-                    title: '金额'
+                    title: '金额',
+                    footerFormatter:function (value) {
+                        var sumBalance = 0;
+                        for (var i in value) {
+                            sumBalance += parseFloat(value[i].amount);
+                        }
+                        return "总金额：" + sumBalance;
+                    }
                 },
                 {
                     field: 'payUrl',
@@ -192,6 +205,15 @@
             };
             $.table.init(options);
         });
+
+        function footerStyle(column) {
+            return {
+                amount: {
+                    css: { color: 'red', 'font-weight': 'normal' }
+                }
+            }[column.field]
+        }
+
     </script>
 </body>
 </html>

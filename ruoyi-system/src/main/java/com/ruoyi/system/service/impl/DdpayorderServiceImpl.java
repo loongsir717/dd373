@@ -637,9 +637,15 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                     ddpayorder.setStatus(1L);
                     ddpayorder.setCompletionTime(new Date());
                     count = ddpayorderMapper.updateDdpayorder(ddpayorder);
-                    Long countOrder = sysTokenInfo.getCountOrder();
-                    sysTokenInfo.setCountOrder(countOrder++);
-                    sysTokenInfoMapper.updateSysTokenInfo(sysTokenInfo);
+                    if(count>0){
+                        Long countOrder = sysTokenInfo.getCountOrder();
+                        if(countOrder>0){
+                            sysTokenInfo.setCountOrder(countOrder+1);
+                        }else{
+                            sysTokenInfo.setCountOrder(1L);
+                        }
+                        sysTokenInfoMapper.updateSysTokenInfo(sysTokenInfo);
+                    }
                 }
             }
             return ddpayorder;
