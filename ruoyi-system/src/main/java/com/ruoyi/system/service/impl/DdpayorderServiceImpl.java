@@ -384,7 +384,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String adderssId = sysTokenInfo.getUserAdderss();
         //2、查询商品列表  URL  http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8  get
         String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
-        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=20",Constants.UTF8,cookie);
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
         if(StringUtils.isEmpty(resultShopGoodsStr)){
             return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品列表失敗",null);
         }
