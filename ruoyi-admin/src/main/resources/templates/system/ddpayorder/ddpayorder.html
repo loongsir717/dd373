@@ -56,14 +56,16 @@
                 <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:ddpayorder:export">
                     <i class="fa fa-download"></i> 导出
                 </a>
+<!--                <div th:include="include :: footer"></div>-->
+                <th:block th:include="include :: footer" />
             </div>
             <div class="col-sm-12 select-table table-striped">
                 <table id="bootstrap-table"></table>
             </div>
         </div>
     </div>
-     <div th:include="include :: footer"></div>
-<!--    <th:block th:include="include :: footer" />-->
+
+
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('system:ddpayorder:edit')}]];
         var removeFlag = [[${@permission.hasPermi('system:ddpayorder:remove')}]];
@@ -109,11 +111,15 @@
                     field: 'amount',
                     title: '金额',
                     footerFormatter:function (value) {
-                        var sumBalance = 0;
+                        var sumPayBalance = 0;
+                        var sumOrderBalance = 0;
                         for (var i in value) {
-                            sumBalance += parseFloat(value[i].amount);
+                            if(value[i].status == 1){
+                                sumPayBalance += parseFloat(value[i].amount);
+                            }
+                            sumOrderBalance += parseFloat(value[i].amount);
                         }
-                        return "总金额：" + sumBalance;
+                        return "订单总金额：" + sumOrderBalance+"</br> 支付总金额：" + sumPayBalance;
                     }
                 },
                 {
