@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -350,7 +351,16 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             log.info("回调参数： "+postData);
             log.info("回调地址： "+ddpayorder.getCallbackUrl());
             String callbackJson = "";
-           callbackJson  =  HttpUtils.doHttpPost(ddpayorder.getCallbackUrl(),postData,"application/json",null);
+
+            HashMap<String, Object> paramMap = new HashMap<>();
+            paramMap.put("appid", appid);
+            paramMap.put("orderNo", ddpayorder.getOrderId());
+            paramMap.put("merchantOrderNo", ddpayorder.getMerchantOrderNo());
+            paramMap.put("payStatus", ddpayorder.getStatus()+"");
+            paramMap.put("amount", ddpayorder.getAmount()+"");
+            paramMap.put("payTime", ddpayorder.getCompletionTime().getTime()+"");
+            paramMap.put("sign", sign);
+            callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
             if("success".equals(callbackJson)){
                 ddpayorder.setCallbackStatus(1);
                 int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
@@ -374,7 +384,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String adderssId = sysTokenInfo.getUserAdderss();
         //2、查询商品列表  URL  http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8  get
         String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
-        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=8",Constants.UTF8,cookie);
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
         if(StringUtils.isEmpty(resultShopGoodsStr)){
             return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品列表失敗",null);
         }
@@ -405,34 +415,39 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         JSONObject productInfoObj  = JSONObject.parseObject(resultProductInfoStr);
         JSONObject resultProductInfoJson = (JSONObject) productInfoObj.get("data");
         JSONArray productAttr = (JSONArray)  resultProductInfoJson.get("productAttr");
-        if(productAttr == null || productAttr.size()<=0){
-            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+        JSONObject productStoreInfo = (JSONObject)  resultProductInfoJson.get("storeInfo");
+        Integer product_id = null;
+        String unique = "";
+        if(productAttr != null && productAttr.size()>0){
+            JSONObject attr_valuesObj = (JSONObject) productAttr.get(0);
+            JSONArray attr_values = (JSONArray)  attr_valuesObj.get("attr_values");
+            String arrt = "";
+            if(attr_values.size()>0){
+                arrt = (String) attr_values.get(0);
+            }else{
+                return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+            }
+            if(StringUtils.isEmpty(arrt)){
+              return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+            }
+            JSONObject productValues = (JSONObject)  resultProductInfoJson.get("productValue");
+            Set<String> keys = productValues.keySet();
+            JSONObject productValue = null;
+            for(String t:keys){
+                productValue = (JSONObject) productValues.get(t);
+            }
+            if(productValue == null ){
+                return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失败",null);
+            }
+            product_id = productValue.getInteger("product_id");
+            unique = productValue.getString("unique");
         }
-        JSONObject attr_valuesObj = (JSONObject) productAttr.get(0);
-        JSONArray attr_values = (JSONArray)  attr_valuesObj.get("attr_values");
-        String arrt = "";
-        if(attr_values.size()>0){
-            arrt = (String) attr_values.get(0);
-        }else{
-            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+        if(productStoreInfo != null){
+            product_id = productStoreInfo.getInteger("id");
         }
-        if(StringUtils.isEmpty(arrt)){
-          return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
-        }
-        JSONObject productValues = (JSONObject)  resultProductInfoJson.get("productValue");
-        Set<String> keys = productValues.keySet();
-        JSONObject productValue = null;
-        for(String t:keys){
-            productValue = (JSONObject) productValues.get(t);
-        }
-        if(productValue == null ){
-            return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失败",null);
-        }
-        Integer product_id = productValue.getInteger("product_id");
         log.info("获取商品详情  product_id:"+product_id);
-        String unique = (String)  productValue.get("unique");
         log.info("获取商品详情  unique:"+unique);
-        if(product_id < 0 || StringUtils.isEmpty(unique)){
+        if(product_id < 0){
             return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",null);
         }
         //4、加入购物车  URL   http://h5.mall2.yingliao.tv/api/cart/add post           {"productId":"4","cartNum":1,"new":1,"uniqueId":"1e734f6b","virtual_type":0}
