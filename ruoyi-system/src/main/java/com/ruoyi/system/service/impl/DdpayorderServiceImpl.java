@@ -668,17 +668,17 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         return ddpayorder;
     }
 
-    public static void main(String[] args) {
-        HashMap<String, Object> paramMap = new HashMap<>();
-        paramMap.put("appid", "c11fcf6bd93c495a88bc5e252d680f320");
-        paramMap.put("orderNo", "cp334313218988048384");
-        paramMap.put("merchantOrderNo", "P01970320221214124126920");
-        paramMap.put("payStatus", "1");
-        paramMap.put("amount", "100.00");
-        paramMap.put("payTime", "1670992911000");
-        paramMap.put("sign", "C5F54FC482836D52534D748C576FC0D6");
-        String callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
-
-        System.out.println(callbackJson);
-    }
+//    public static void main(String[] args) {
+//        HashMap<String, Object> paramMap = new HashMap<>();
+//        paramMap.put("appid", "c11fcf6bd93c495a88bc5e252d680f320");
+//        paramMap.put("orderNo", "cp334313218988048384");
+//        paramMap.put("merchantOrderNo", "P01970320221214124126920");
+//        paramMap.put("payStatus", "1");
+//        paramMap.put("amount", "100.00");
+//        paramMap.put("payTime", "1670992911000");
+//        paramMap.put("sign", "C5F54FC482836D52534D748C576FC0D6");
+//        String callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
+//
+//        System.out.println(callbackJson);
+//    }
 }
