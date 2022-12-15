@@ -355,6 +355,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             paramMap.put("payTime", ddpayorder.getCompletionTime().getTime()+"");
             paramMap.put("sign", sign);
             callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
+            log.info("------------回调返回值："+callbackJson);
             if("success".equals(callbackJson)){
                 ddpayorder.setCallbackStatus(1);
                 int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
