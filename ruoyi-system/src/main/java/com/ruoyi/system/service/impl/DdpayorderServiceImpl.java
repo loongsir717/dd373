@@ -2,9 +2,6 @@ package com.ruoyi.system.service.impl;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import cn.hutool.http.HttpUtil;
@@ -13,13 +10,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.DdPayOrderApi;
 import com.ruoyi.common.core.domain.entity.OrderLinkJson;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.security.Md5Utils;
-import com.ruoyi.system.controller.DuanxingApi;
 import com.ruoyi.system.domain.Ddpayshop;
 import com.ruoyi.system.domain.ShopGoods;
 import com.ruoyi.system.domain.SysTokenInfo;
@@ -49,7 +44,6 @@ import com.ruoyi.system.service.IDdpayorderService;
 import com.ruoyi.common.core.text.Convert;
 import org.springframework.web.util.UriUtils;
 
-import javax.swing.*;
 
 /**
  * 多多373订单Service业务层处理
@@ -383,25 +377,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String cookie = sysTokenInfo.getCookie();
         String adderssId = sysTokenInfo.getUserAdderss();
         //2、查询商品列表  URL  http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8  get
-        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
-        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
-        if(StringUtils.isEmpty(resultShopGoodsStr)){
-            return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品列表失敗",null);
-        }
-        log.info( "----------------返回值:"+resultShopGoodsStr);
-        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
-        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
-        String shopGoodslist = resultDataJson.getString("list");
-        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
-        String productId = "";
-        for (ShopGoods goods:shopGoods ) {
-            BigDecimal bd = new BigDecimal(goods.getPrice());
-            log.info( "-—---商品价格："+bd+";订单价格："+ddpayorder.getAmount());
-            if(bd.compareTo(ddpayorder.getAmount()) == 0 ){
-                productId = goods.getId();
-                break;
-            }
-        }
+        String productId = getProductIds(ddpayorder.getAmount(),cookie);
         if(StringUtils.isEmpty(productId)){
             return new AjaxResult(AjaxResult.Type.ERROR,"没有价格为"+ddpayorder.getAmount()+"的商品",null);
         }
@@ -667,4 +643,57 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         }
         return ddpayorder;
     }
+
+
+    public  String getProductId(BigDecimal amount,String cookie){
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
+        if(StringUtils.isEmpty(resultShopGoodsStr)){
+            return null;
+        }
+        log.info( "----------------返回值:"+resultShopGoodsStr);
+        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+        String shopGoodslist = resultDataJson.getString("list");
+        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
+        String productId = "";
+        for (ShopGoods goods:shopGoods ) {
+            BigDecimal bd = new BigDecimal(goods.getPrice());
+            log.info( "-—---商品价格："+bd+";订单价格："+amount);
+            if(bd.compareTo(amount) == 0 ){
+                productId = goods.getId();
+                break;
+            }
+        }
+        return productId;
+    }
+
+    public  String getProductIds(BigDecimal amount,String cookie){
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
+        if(StringUtils.isEmpty(resultShopGoodsStr)){
+            return null;
+        }
+        log.info( "----------------返回值:"+resultShopGoodsStr);
+        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+        String shopGoodslist = resultDataJson.getString("list");
+        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
+        String productId = "";
+        List<String> productIds = new ArrayList<String>();
+        for (ShopGoods goods:shopGoods ) {
+            BigDecimal bd = new BigDecimal(goods.getPrice());
+            log.info( "-—---商品价格："+bd+";订单价格："+amount);
+            if(bd.compareTo(amount) == 0 ){
+                productIds.add(goods.getId());
+            }
+        }
+        if(productIds.size()<1){
+            return null;
+        }
+        Random random = new Random();
+        productId =  productIds.get(random.nextInt(productIds.size()));
+        return productId;
+    }
+
 }
