@@ -671,8 +671,8 @@ public class DdpayorderServiceImpl implements IDdpayorderService
     }
 
     public  String getProductIds(BigDecimal amount,String cookie){
-        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
-        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/999";
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"price="+amount+"&page=1&limit=50",Constants.UTF8,cookie);
         if(StringUtils.isEmpty(resultShopGoodsStr)){
             return null;
         }
@@ -682,19 +682,12 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String shopGoodslist = resultDataJson.getString("list");
         List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
         String productId = "";
-        List<String> productIds = new ArrayList<String>();
-        for (ShopGoods goods:shopGoods ) {
-            BigDecimal bd = new BigDecimal(goods.getPrice());
-            log.info( "-—---商品价格："+bd+";订单价格："+amount);
-            if(bd.compareTo(amount) == 0 ){
-                productIds.add(goods.getId());
-            }
+        if(shopGoods !=null && shopGoods.size()>0){
+            Random random = new Random();
+            int i = random.nextInt(shopGoods.size());
+            productId =  shopGoods.get(i).getId();
+            log.info( "------产品单价为:"+amount+"的有"+shopGoods.size()+"个，取第"+i+"个！产品ID为："+productId);
         }
-        if(productIds.size()<1){
-            return null;
-        }
-        Random random = new Random();
-        productId =  productIds.get(random.nextInt(productIds.size()));
         return productId;
     }
 
