@@ -341,15 +341,15 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             log.info("加密前未加token的串： "+parm);
             String sign = Md5Utils.hash(parm+token).toUpperCase();
             log.info("加token后的加密后的串： "+sign);
-//            String postData = "{\"appid\":\""+appid+"\"," +
-//                    "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
-//                    "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
-//                    "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
-//                    "\"amount\":\""+ddpayorder.getAmount()+"\"," +
-//                    "\"payTime\":\""+ddpayorder.getCompletionTime().getTime()+"\"," +
-//                    "\"sign\":\""+sign+"\"}";
-//            log.info("回调参数： "+postData);
-//            log.info("回调地址： "+ddpayorder.getCallbackUrl());
+            String postData = "{\"appid\":\""+appid+"\"," +
+                    "\"orderNo\":\""+ddpayorder.getOrderId()+"\"," +
+                    "\"merchantOrderNo\":\""+ddpayorder.getMerchantOrderNo()+"\"," +
+                    "\"payStatus\":\""+ddpayorder.getStatus()+"\"," +
+                    "\"amount\":\""+ddpayorder.getAmount()+"\"," +
+                    "\"payTime\":\""+ddpayorder.getCompletionTime().getTime()+"\"," +
+                    "\"sign\":\""+sign+"\"}";
+            log.info("回调参数： "+postData);
+            log.info("回调地址： "+ddpayorder.getCallbackUrl());
             String callbackJson = "";
 
             HashMap<String, Object> paramMap = new HashMap<>();
@@ -667,18 +667,4 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         }
         return ddpayorder;
     }
-
-//    public static void main(String[] args) {
-//        HashMap<String, Object> paramMap = new HashMap<>();
-//        paramMap.put("appid", "c11fcf6bd93c495a88bc5e252d680f320");
-//        paramMap.put("orderNo", "cp334313218988048384");
-//        paramMap.put("merchantOrderNo", "P01970320221214124126920");
-//        paramMap.put("payStatus", "1");
-//        paramMap.put("amount", "100.00");
-//        paramMap.put("payTime", "1670992911000");
-//        paramMap.put("sign", "C5F54FC482836D52534D748C576FC0D6");
-//        String callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
-//
-//        System.out.println(callbackJson);
-//    }
 }
