@@ -2,9 +2,6 @@ package com.ruoyi.system.service.impl;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import cn.hutool.http.HttpUtil;
@@ -13,13 +10,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.DdPayOrderApi;
 import com.ruoyi.common.core.domain.entity.OrderLinkJson;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.security.Md5Utils;
-import com.ruoyi.system.controller.DuanxingApi;
 import com.ruoyi.system.domain.Ddpayshop;
 import com.ruoyi.system.domain.ShopGoods;
 import com.ruoyi.system.domain.SysTokenInfo;
@@ -49,7 +44,6 @@ import com.ruoyi.system.service.IDdpayorderService;
 import com.ruoyi.common.core.text.Convert;
 import org.springframework.web.util.UriUtils;
 
-import javax.swing.*;
 
 /**
  * 多多373订单Service业务层处理
@@ -181,134 +175,134 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         }
         //查询状态正常
         //獲取店鋪appid/和對應賬號的cookie
-           //根據店铺 获取订单ID号
-           String cookie = ddpayshop.getCookie();
-           String objJson ="";
-            try{
-                objJson = HttpUtils.sendGet(orderIdUri, param, Constants.UTF8,cookie);
-            }catch (Exception e){
+        //根據店铺 获取订单ID号
+        String cookie = ddpayshop.getCookie();
+        String objJson ="";
+        try{
+            objJson = HttpUtils.sendGet(orderIdUri, param, Constants.UTF8,cookie);
+        }catch (Exception e){
 
-            }
-            if(StringUtils.isEmpty(objJson)){
-                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
-            }
-           if(StringUtils.isEmpty(objJson)){
-               return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
-           }
-           JSONObject jsonObject  = JSONObject.parseObject(objJson);
-           // {"StatusCode":"0","StatusMsg":"请求成功","StatusData":{"ResultCode":"0","ResultMsg":"操作成功","ResultData":"79fbf99327d04ebf84c37c45689fe46c"}}
-           JSONObject jsonObject1 = (JSONObject) jsonObject.get("StatusData");
-           if(StringUtils.isEmpty(jsonObject1)){
-               return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
-           }
-           resultCode = (String) jsonObject1.get("ResultCode");
-           if("4001".equals(resultCode)){
-               ddpayshop.setStatus(0);
-               ddpayshopMapper.updateDdpayshop(ddpayshop);
-               return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
-           }else if(!"0".equals(resultCode)){
-               return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
-           }
-           String orderId = (String) jsonObject1.get("ResultData");
-           log.info( "----------------获取订单Id:"+orderId);
-            param = "OrderId="+orderId+"&payScene[0]=1&payScene[1]=3";
+        }
+        if(StringUtils.isEmpty(objJson)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+        }
+        if(StringUtils.isEmpty(objJson)){
+            return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
+        }
+        JSONObject jsonObject  = JSONObject.parseObject(objJson);
+        // {"StatusCode":"0","StatusMsg":"请求成功","StatusData":{"ResultCode":"0","ResultMsg":"操作成功","ResultData":"79fbf99327d04ebf84c37c45689fe46c"}}
+        JSONObject jsonObject1 = (JSONObject) jsonObject.get("StatusData");
+        if(StringUtils.isEmpty(jsonObject1)){
+            return new AjaxResult(AjaxResult.Type.ERROR1,"返回参数为空",null);
+        }
+        resultCode = (String) jsonObject1.get("ResultCode");
+        if("4001".equals(resultCode)){
+            ddpayshop.setStatus(0);
+            ddpayshopMapper.updateDdpayshop(ddpayshop);
+            return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
+        }else if(!"0".equals(resultCode)){
+            return new AjaxResult(AjaxResult.Type.ERROR1,(String) jsonObject1.get("ResultMsg"),null);
+        }
+        String orderId = (String) jsonObject1.get("ResultData");
+        log.info( "----------------获取订单Id:"+orderId);
+        param = "OrderId="+orderId+"&payScene[0]=1&payScene[1]=3";
 
-           String orderNoJson = "";
+        String orderNoJson = "";
 
-            try{
-                orderNoJson = HttpUtils.sendGet(orderNoUri, param, Constants.UTF8,cookie);
-            }catch (Exception e){
+        try{
+            orderNoJson = HttpUtils.sendGet(orderNoUri, param, Constants.UTF8,cookie);
+        }catch (Exception e){
 
-            }
-            if(StringUtils.isEmpty(orderNoJson)){
-                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
-            }
+        }
+        if(StringUtils.isEmpty(orderNoJson)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+        }
 
 
-           if(StringUtils.isEmpty(orderNoJson)){
-               return new AjaxResult(AjaxResult.Type.ERROR2,"获取订单号请求，返回参数为空！",null);
-           }
-           JSONObject jsonObject2  = JSONObject.parseObject(orderNoJson);
-           JSONObject statusData = (JSONObject) jsonObject2.get("StatusData");
-           if(StringUtils.isEmpty(statusData)){
-               return new AjaxResult(AjaxResult.Type.ERROR2,"返回参数为空！",null);
-           }
-           resultCode  = (String) statusData.get("ResultCode");
-           if(!"0".equals(resultCode)){
-               return new AjaxResult(AjaxResult.Type.ERROR2,(String) jsonObject1.get("ResultMsg"),null);
-           }
-           JSONObject resultData= (JSONObject) statusData.get("ResultData");
-           JSONArray array = (JSONArray) resultData.get("OrderInfos");
-           String OrderNo ="";
-           String describe = "";
-           BigDecimal price = null;  //订单金额
-            if(array.size()>0){
-                JSONObject ob = (JSONObject) array.get(0);//得到json对象
-                 OrderNo =(String)  ob.get("OrderId");//订单编号
-                 describe = (String) ob.get("Describe");// 订单说明
-                price = (BigDecimal) ob.get("Price");  //订单金额
-            }
+        if(StringUtils.isEmpty(orderNoJson)){
+            return new AjaxResult(AjaxResult.Type.ERROR2,"获取订单号请求，返回参数为空！",null);
+        }
+        JSONObject jsonObject2  = JSONObject.parseObject(orderNoJson);
+        JSONObject statusData = (JSONObject) jsonObject2.get("StatusData");
+        if(StringUtils.isEmpty(statusData)){
+            return new AjaxResult(AjaxResult.Type.ERROR2,"返回参数为空！",null);
+        }
+        resultCode  = (String) statusData.get("ResultCode");
+        if(!"0".equals(resultCode)){
+            return new AjaxResult(AjaxResult.Type.ERROR2,(String) jsonObject1.get("ResultMsg"),null);
+        }
+        JSONObject resultData= (JSONObject) statusData.get("ResultData");
+        JSONArray array = (JSONArray) resultData.get("OrderInfos");
+        String OrderNo ="";
+        String describe = "";
+        BigDecimal price = null;  //订单金额
+        if(array.size()>0){
+            JSONObject ob = (JSONObject) array.get(0);//得到json对象
+            OrderNo =(String)  ob.get("OrderId");//订单编号
+            describe = (String) ob.get("Describe");// 订单说明
+            price = (BigDecimal) ob.get("Price");  //订单金额
+        }
 
-            JSONArray payTypes = (JSONArray) resultData.get("PayTypes");
-            String payTypeId ="";
-            if(payTypes.size()>0){
-                JSONObject ob = (JSONObject) payTypes.get(0);//得到json对象
-                payTypeId =(String)  ob.get("Id");//支付类型Id
-            }
-           log.info( "----------------PayTypes——Id:"+payTypeId);
-           //根據订单ID号 获取支付链接
-           OrderLinkJson olj = new OrderLinkJson();
-           olj.setOrderId(orderId);
-           olj.setBankCode("");
-           olj.setScenceType("");
-           olj.setPayScene(3);
-           olj.setVerifyCode("");
-           olj.setPurpose("");
-           olj.setSendWay(0);
-           olj.setIsWap(true);
-           olj.setPayTypeId(payTypeId);
-           log.info( "----------------获取订单链接参数:"+olj.toString());
-            String resorderPayLinkJson = "";
-            try{
-                resorderPayLinkJson = HttpUtils.doHttpPost(orderPayLink,olj.toString(),"application/json",cookie);
-            }catch (Exception e){
-            }
-            if(StringUtils.isEmpty(resorderPayLinkJson)){
-                return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
-            }
-           log.info( "----------------返回值:"+resorderPayLinkJson);
-           if(StringUtils.isEmpty(resorderPayLinkJson)){
-               return new AjaxResult(AjaxResult.Type.ERROR3,"获取订单支付链接失败",null);
-           }
-           JSONObject orderPayLinkJson  = JSONObject.parseObject(resorderPayLinkJson);
-           JSONObject statusData1 = (JSONObject) orderPayLinkJson.get("StatusData");
-           resultCode = (String) statusData1.get("ResultCode");
-           if(!"0".equals(resultCode)){
-               return new AjaxResult(AjaxResult.Type.ERROR3,(String) statusData1.get("ResultMsg"),null);
-           }
-           JSONObject resultData2 = (JSONObject) statusData1.get("ResultData");
-           String orderPayLink = (String) resultData2.get("Action");
-           log.info( "获取订单链接:"+orderPayLink);
-           ddpayorder.setAppid(ddpayshop.getAppid());
-           ddpayorder.setName(ddpayshop.getName());
-           ddpayorder.setOrderId(OrderNo);
-           ddpayorder.setAmount(price);
-           ddpayorder.setCallbackStatus(0);
-           ddpayorder.setPayUrl(UriUtils.decode(orderPayLink,"UTF-8"));
-           ddpayorder.setOrderUrl(UriUtils.decode(orderPayLink,"UTF-8"));
-           ddpayorder.setMethod("0");  //只有支付宝
-           ddpayorder.setBody(describe);
-           ddpayorder.setCreateTime(new Date());
-           int count = ddpayorderMapper.insertDdpayorder(ddpayorder);
-           if(count>0){
-               Map<String,String > map = new HashMap();
-               map.put("orderPayLink",orderPayLink);
-               map.put("orderNo",OrderNo);
-               map.put("merchantOrderNo",ddpayorder.getMerchantOrderNo());
-               return new AjaxResult(AjaxResult.Type.SUCCESS,null, JSONObject.toJSON(map));
-           }else{
-               return new AjaxResult(AjaxResult.Type.ERROR,"插入数据失败",null);
-           }
+        JSONArray payTypes = (JSONArray) resultData.get("PayTypes");
+        String payTypeId ="";
+        if(payTypes.size()>0){
+            JSONObject ob = (JSONObject) payTypes.get(0);//得到json对象
+            payTypeId =(String)  ob.get("Id");//支付类型Id
+        }
+        log.info( "----------------PayTypes——Id:"+payTypeId);
+        //根據订单ID号 获取支付链接
+        OrderLinkJson olj = new OrderLinkJson();
+        olj.setOrderId(orderId);
+        olj.setBankCode("");
+        olj.setScenceType("");
+        olj.setPayScene(3);
+        olj.setVerifyCode("");
+        olj.setPurpose("");
+        olj.setSendWay(0);
+        olj.setIsWap(true);
+        olj.setPayTypeId(payTypeId);
+        log.info( "----------------获取订单链接参数:"+olj.toString());
+        String resorderPayLinkJson = "";
+        try{
+            resorderPayLinkJson = HttpUtils.doHttpPost(orderPayLink,olj.toString(),"application/json",cookie);
+        }catch (Exception e){
+        }
+        if(StringUtils.isEmpty(resorderPayLinkJson)){
+            return new AjaxResult(AjaxResult.Type.ERROR,"调用失败",null);
+        }
+        log.info( "----------------返回值:"+resorderPayLinkJson);
+        if(StringUtils.isEmpty(resorderPayLinkJson)){
+            return new AjaxResult(AjaxResult.Type.ERROR3,"获取订单支付链接失败",null);
+        }
+        JSONObject orderPayLinkJson  = JSONObject.parseObject(resorderPayLinkJson);
+        JSONObject statusData1 = (JSONObject) orderPayLinkJson.get("StatusData");
+        resultCode = (String) statusData1.get("ResultCode");
+        if(!"0".equals(resultCode)){
+            return new AjaxResult(AjaxResult.Type.ERROR3,(String) statusData1.get("ResultMsg"),null);
+        }
+        JSONObject resultData2 = (JSONObject) statusData1.get("ResultData");
+        String orderPayLink = (String) resultData2.get("Action");
+        log.info( "获取订单链接:"+orderPayLink);
+        ddpayorder.setAppid(ddpayshop.getAppid());
+        ddpayorder.setName(ddpayshop.getName());
+        ddpayorder.setOrderId(OrderNo);
+        ddpayorder.setAmount(price);
+        ddpayorder.setCallbackStatus(0);
+        ddpayorder.setPayUrl(UriUtils.decode(orderPayLink,"UTF-8"));
+        ddpayorder.setOrderUrl(UriUtils.decode(orderPayLink,"UTF-8"));
+        ddpayorder.setMethod("0");  //只有支付宝
+        ddpayorder.setBody(describe);
+        ddpayorder.setCreateTime(new Date());
+        int count = ddpayorderMapper.insertDdpayorder(ddpayorder);
+        if(count>0){
+            Map<String,String > map = new HashMap();
+            map.put("orderPayLink",orderPayLink);
+            map.put("orderNo",OrderNo);
+            map.put("merchantOrderNo",ddpayorder.getMerchantOrderNo());
+            return new AjaxResult(AjaxResult.Type.SUCCESS,null, JSONObject.toJSON(map));
+        }else{
+            return new AjaxResult(AjaxResult.Type.ERROR,"插入数据失败",null);
+        }
     }
 
     /**
@@ -320,19 +314,19 @@ public class DdpayorderServiceImpl implements IDdpayorderService
      */
     @Override
     public String callbackOrder(Ddpayorder order) {
-            if(order.getStatus() < 1 ){  //如果订单状态为0 则需要请求dd373
-                order = updateOrderPayStatus(order);
-                if(order.getStatus()==1){
-                    String result =  callbackUrl(order);
-                    return result;
-                }else{
-                    return "";
-                }
-            }else{
-                //如果已查询成功、但回调失败，需要重新回调！
+        if(order.getStatus() < 1 ){  //如果订单状态为0 则需要请求dd373
+            order = updateOrderPayStatus(order);
+            if(order.getStatus()==1){
                 String result =  callbackUrl(order);
                 return result;
+            }else{
+                return "";
             }
+        }else{
+            //如果已查询成功、但回调失败，需要重新回调！
+            String result =  callbackUrl(order);
+            return result;
+        }
     }
 
     private String callbackUrl(Ddpayorder ddpayorder){
@@ -360,7 +354,9 @@ public class DdpayorderServiceImpl implements IDdpayorderService
             paramMap.put("amount", ddpayorder.getAmount()+"");
             paramMap.put("payTime", ddpayorder.getCompletionTime().getTime()+"");
             paramMap.put("sign", sign);
-            callbackJson = HttpUtil.post("http://apis3.haha555.xyz/notify/anquan/notify_res.htm", paramMap);
+            callbackJson = HttpUtil.post(ddpayorder.getCallbackUrl(), paramMap);
+
+            log.info("------------回调返回值："+callbackJson);
             if("success".equals(callbackJson)){
                 ddpayorder.setCallbackStatus(1);
                 int count = ddpayorderMapper.updateDdpayorder(ddpayorder);
@@ -383,25 +379,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         String cookie = sysTokenInfo.getCookie();
         String adderssId = sysTokenInfo.getUserAdderss();
         //2、查询商品列表  URL  http://h5.mall2.yingliao.tv/api/groom/list/1?page=1&limit=8  get
-        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
-        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
-        if(StringUtils.isEmpty(resultShopGoodsStr)){
-            return new AjaxResult(AjaxResult.Type.ERROR,"查詢商品列表失敗",null);
-        }
-        log.info( "----------------返回值:"+resultShopGoodsStr);
-        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
-        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
-        String shopGoodslist = resultDataJson.getString("list");
-        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
-        String productId = "";
-        for (ShopGoods goods:shopGoods ) {
-            BigDecimal bd = new BigDecimal(goods.getPrice());
-            log.info( "-—---商品价格："+bd+";订单价格："+ddpayorder.getAmount());
-            if(bd.compareTo(ddpayorder.getAmount()) == 0 ){
-                productId = goods.getId();
-                break;
-            }
-        }
+        String productId = getProductIds(ddpayorder.getAmount(),cookie);
         if(StringUtils.isEmpty(productId)){
             return new AjaxResult(AjaxResult.Type.ERROR,"没有价格为"+ddpayorder.getAmount()+"的商品",null);
         }
@@ -428,7 +406,7 @@ public class DdpayorderServiceImpl implements IDdpayorderService
                 return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
             }
             if(StringUtils.isEmpty(arrt)){
-              return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
+                return new AjaxResult(AjaxResult.Type.ERROR,"获取商品详情失敗",productAttr);
             }
             JSONObject productValues = (JSONObject)  resultProductInfoJson.get("productValue");
             Set<String> keys = productValues.keySet();
@@ -667,4 +645,57 @@ public class DdpayorderServiceImpl implements IDdpayorderService
         }
         return ddpayorder;
     }
+
+
+    public  String getProductId(BigDecimal amount,String cookie){
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
+        if(StringUtils.isEmpty(resultShopGoodsStr)){
+            return null;
+        }
+        log.info( "----------------返回值:"+resultShopGoodsStr);
+        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+        String shopGoodslist = resultDataJson.getString("list");
+        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
+        String productId = "";
+        for (ShopGoods goods:shopGoods ) {
+            BigDecimal bd = new BigDecimal(goods.getPrice());
+            log.info( "-—---商品价格："+bd+";订单价格："+amount);
+            if(bd.compareTo(amount) == 0 ){
+                productId = goods.getId();
+                break;
+            }
+        }
+        return productId;
+    }
+
+    public  String getProductIds(BigDecimal amount,String cookie){
+        String queryGoodsUrl = "http://h5.mall2.yingliao.tv/api/groom/list/1";
+        String resultShopGoodsStr  = HttpUtils.sendGet(queryGoodsUrl,"page=1&limit=50",Constants.UTF8,cookie);
+        if(StringUtils.isEmpty(resultShopGoodsStr)){
+            return null;
+        }
+        log.info( "----------------返回值:"+resultShopGoodsStr);
+        JSONObject shopGoodsJSONObject  = JSONObject.parseObject(resultShopGoodsStr);
+        JSONObject resultDataJson = (JSONObject) shopGoodsJSONObject.get("data");
+        String shopGoodslist = resultDataJson.getString("list");
+        List<ShopGoods> shopGoods = JSON.parseArray(shopGoodslist, ShopGoods.class);
+        String productId = "";
+        List<String> productIds = new ArrayList<String>();
+        for (ShopGoods goods:shopGoods ) {
+            BigDecimal bd = new BigDecimal(goods.getPrice());
+            log.info( "-—---商品价格："+bd+";订单价格："+amount);
+            if(bd.compareTo(amount) == 0 ){
+                productIds.add(goods.getId());
+            }
+        }
+        if(productIds.size()<1){
+            return null;
+        }
+        Random random = new Random();
+        productId =  productIds.get(random.nextInt(productIds.size()));
+        return productId;
+    }
+
 }
